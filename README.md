@@ -1,4 +1,14 @@
-# Sparkling Mutuals
+<h1 align="center">Sparkling Mutuals</h1>
+
+<p align="center">
+  <img src="src/main/resources/assets/sparkling-mutuals/icon.png" width="80" height="80" alt="Sparkling Mutuals logo">
+</p>
+
+<p align="center">
+  <a href="https://discord.com/channels/1567856303341051905/1567859199491186749"><img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&amp;logo=discord&amp;logoColor=white" alt="Discord"></a>
+  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Made%20with-Kotlin-7F52FF?style=for-the-badge&amp;logo=kotlin&amp;logoColor=white" alt="Made with Kotlin"></a>
+  <a href="https://github.com/johnceoskyblock/sparkling-mutuals/releases/latest"><img src="https://img.shields.io/github/downloads/johnceoskyblock/sparkling-mutuals/total?label=Downloads&amp;style=for-the-badge&amp;logo=github" alt="Downloads"></a>
+</p>
 
 A Fabric client mod for Hypixel SkyBlock’s Critter Safari.
 
