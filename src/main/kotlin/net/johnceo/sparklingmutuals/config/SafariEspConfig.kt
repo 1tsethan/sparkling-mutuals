@@ -70,7 +70,10 @@ object SafariEspConfig {
         set(value) { field = validTextScale(value) }
     val teammateLabelWorldScale get() = .025f * teammateTextScale
     var teammateColor = defaultColor(0xFF55FF55.toInt())
-    fun boxGlowFallback(name: String)=name=="Duplico" || name=="Driftling"
+    fun boxGlowFallback(name: String)=when (name) {
+        "Duplico", "Driftling", "Gazer" -> true
+        else -> false
+    }
     fun showCritterBox(name: String)=critterBoxes || critterGlow && boxGlowFallback(name)
     var critterGlow = true
     var critterBoxes = false
