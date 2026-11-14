@@ -74,6 +74,20 @@ object ShardSaleGuidance {
                 total.restore(boxes,now);total.restore(totals,now);total.reset();loaded=true
             }
         }
+        ClientReceiveMessageEvents.ALLOW_GAME.register { message,overlay ->
+            val client=Minecraft.getInstance()
+            if(overlay || !ConfigManager.shardSaleGuidance || !SkyblockSidebar.inSkyblock(client))true
+            else {
+                syncIdentity(client)
+                if(profileConfirmation.consumeAutomaticReply(message,System.currentTimeMillis())) {
+                    val confirmed=SaleProfileEvidence.profile(message)
+                    if(profile==null && confirmed!=null) {
+                        profile=confirmed;session.reset();total.reset();view=null;orderView=null
+                    }
+                    false
+                } else true
+            }
+        }
         ClientReceiveMessageEvents.GAME.register {message,overlay ->
             val client=Minecraft.getInstance()
             if(!overlay && SkyblockSidebar.inSkyblock(client)) {

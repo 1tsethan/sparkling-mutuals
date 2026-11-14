@@ -10,6 +10,8 @@ internal class SaleProfileConfirmation {
     private var drainUntil=Long.MIN_VALUE
     private var lastNow: Long?=null
     private var attempts=0
+    private var quietReply: String?=null
+    private var quietUntil=0L
     fun next(active: Boolean,verified: Boolean,now: Long): Boolean {
         if(!time(now))return false
         if(!active || verified) {
@@ -21,7 +23,7 @@ internal class SaleProfileConfirmation {
             readyAt=maxOf(readyAt ?: Long.MIN_VALUE,now+1000)
         }
         if(attempts>=3 || now<(readyAt ?: Long.MAX_VALUE) || pendingUntil?.let {now<=it}==true)return false
-        attempts++;sentAt=now;pendingUntil=now+15000;drainUntil=now+15001;readyAt=now+30000
+        attempts++;quietReply=null;sentAt=now;pendingUntil=now+15000;drainUntil=now+15001;readyAt=now+30000
         return true
     }
     fun accept(message: Component,now: Long): String? {
@@ -29,6 +31,15 @@ internal class SaleProfileConfirmation {
         val id=SaleProfileEvidence.profile(message) ?: return null
         pendingUntil=null
         return id
+    }
+    fun consumeAutomaticReply(message: Component,now: Long): Boolean {
+        val id=SaleProfileEvidence.profile(message) ?: return false
+        if(now>drainUntil || now<(sentAt ?: return false))return false
+        if(quietReply==id && now<=quietUntil)return true
+        if(accept(message,now)!=id)return false
+        quietReply=id
+        quietUntil=now+500
+        return true
     }
     fun passiveLegacy(message: Component,now: Long): String? {
         if(!time(now) || now<drainUntil || pendingUntil!=null)return null

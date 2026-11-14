@@ -10,6 +10,16 @@ class SaleProfileConfirmationTest {
     private val compact=id.replace("-","")
     private fun reply(value: String=id,label: String="DASHES")=Component.literal("CLICK THIS TO SUGGEST IT IN CHAT [$label]")
         .withStyle {it.withClickEvent(ClickEvent.SuggestCommand(value))}
+    @Test fun `only matching automatic reply lines are suppressed`() {
+        val requests=SaleProfileConfirmation()
+        assertFalse(requests.consumeAutomaticReply(reply(),1000))
+        assertFalse(requests.next(true,false,1000))
+        assertTrue(requests.next(true,false,2000))
+        assertFalse(requests.consumeAutomaticReply(reply("bad"),2001))
+        assertTrue(requests.consumeAutomaticReply(reply(),2002))
+        assertTrue(requests.consumeAutomaticReply(reply(compact,"NO DASHES"),2003))
+        assertFalse(requests.consumeAutomaticReply(reply(),18000))
+    }
     @Test fun `current clickable profile labels read UUID data through inherited and split styles`() {
         for(message in listOf(reply(),reply(compact,"NO DASHES"),Component.empty().withStyle {
             it.withClickEvent(ClickEvent.SuggestCommand(id))}.append(Component.literal("CLICK THIS TO SUGGEST "))
