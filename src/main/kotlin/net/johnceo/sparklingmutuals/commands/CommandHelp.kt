@@ -6,7 +6,7 @@ import net.johnceo.sparklingmutuals.safari.completion.SafariFullClear
 /** Local slash-command help and the separate mode-aware party command reply. */
 object CommandHelp {
     private val party = listOf(
-        PartyCommandKind.MUTUALS, PartyCommandKind.MISSING, PartyCommandKind.TICKETS,
+        PartyCommandKind.MUTUALS, PartyCommandKind.MISSING, PartyCommandKind.TICKETS, PartyCommandKind.DYE,
         PartyCommandKind.SINCE_SPARKLING, PartyCommandKind.SINCE_UNIQUE,
         PartyCommandKind.PB_DOOM, PartyCommandKind.PB_WUMPA, PartyCommandKind.PB_FOREST,
         PartyCommandKind.PB_CAVERN, PartyCommandKind.PB_ICY, PartyCommandKind.PB_HAUNTED,
@@ -45,6 +45,6 @@ object CommandHelp {
     fun localLines(mode: SafariMode = SafariFullClear.mode) = listOf("§6Sparkling Mutuals — Commands") +
         local.map { (command, description) -> "§6$command §7— $description" }
 
-    fun partyReply(mode: SafariMode = SafariFullClear.mode) = "[SM] Commands: Party: " +
+    fun partyReply(mode: SafariMode = SafariFullClear.mode) = "[SM] Commands: " +
         available(mode).joinToString(", ") { if (it.kind == PartyCommandKind.SINCE_UNIQUE) "${it.text}, !since <critter>" else it.text } + if (mode != SafariMode.FULL_CLEAR) ", !pb doom duo, !pb wumpa duo, !pb doom <IGN>, !pb wumpa <IGN>" else ""
 }
