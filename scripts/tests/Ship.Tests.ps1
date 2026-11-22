@@ -32,10 +32,10 @@ function New-Fixture {
         [IO.File]::WriteAllText((Join-Path $work 'change.txt'),'before')
         Invoke-ShipNative git @('add','--all') | Out-Null
         Invoke-ShipNative git @('commit','-m','Initial') | Out-Null
-        Invoke-ShipNative git @('remote','add','origin','https://github.com/johnceoskyblock/sparkling-mutuals.git') | Out-Null
+        Invoke-ShipNative git @('remote','add','origin','https://github.com/1tsethan/sparkling-mutuals.git') | Out-Null
         # Repo-local rewrite routes every git fetch/push to the disposable bare repository.
         $fileUrl = [uri]::new($bare + [IO.Path]::DirectorySeparatorChar).AbsoluteUri.TrimEnd('/')
-        Invoke-ShipNative git @('config',"url.$fileUrl.insteadOf",'https://github.com/johnceoskyblock/sparkling-mutuals.git') | Out-Null
+        Invoke-ShipNative git @('config',"url.$fileUrl.insteadOf",'https://github.com/1tsethan/sparkling-mutuals.git') | Out-Null
         Invoke-ShipNative git @('push','-u','origin','master') | Out-Null
         $head = Invoke-ShipNative git @('rev-parse','HEAD')
     } finally { Pop-Location }
@@ -90,7 +90,7 @@ function global:gh {
             $assets = @('26.1.2','26.2','26.3' | ForEach-Object {
                 $name="sparkling-mutuals-$($r.tag_name.Substring(1))+mc$_.jar"
                 @{id=$_;name=$name;size=3;digest='sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
-                    browser_download_url="https://github.com/johnceoskyblock/sparkling-mutuals/releases/download/$($r.tag_name)/$name"}
+                    browser_download_url="https://github.com/1tsethan/sparkling-mutuals/releases/download/$($r.tag_name)/$name"}
             })
             if ($s.BadAssets) { $assets = @($assets[0],$assets[1]) }
             $s.Release = @{id=10;draft=$false;prerelease=$false;body=$r.body;name=$r.name;tag_name=$r.tag_name;
@@ -103,7 +103,7 @@ function global:gh {
 }
 function global:Invoke-WebRequest {
     param($Uri,$OutFile,$MaximumRetryCount,$RetryIntervalSec)
-    if (!$Uri.StartsWith('https://github.com/johnceoskyblock/sparkling-mutuals/releases/download/')) { throw 'Unexpected test HTTP URL' }
+    if (!$Uri.StartsWith('https://github.com/1tsethan/sparkling-mutuals/releases/download/')) { throw 'Unexpected test HTTP URL' }
     [IO.File]::WriteAllText($OutFile,'abc')
 }
 

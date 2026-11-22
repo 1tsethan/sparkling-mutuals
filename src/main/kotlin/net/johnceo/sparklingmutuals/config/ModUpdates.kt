@@ -10,11 +10,11 @@ import java.util.concurrent.CompletableFuture
 
 /** Only public release metadata; no credentials, player identifiers, downloads or game-thread HTTP. */
 object ModUpdates {
-    const val REPOSITORY="https://github.com/johnceoskyblock/sparkling-mutuals"
+    const val REPOSITORY="https://github.com/1tsethan/sparkling-mutuals"
     val installed: String=FabricLoader.getInstance().getModContainer("sparkling-mutuals").map { it.metadata.version.friendlyString }.orElse("dev")
     val minecraftVersion: String=FabricLoader.getInstance().getModContainer("minecraft").map { it.metadata.version.friendlyString }.orElse("")
     private val checker = ReleaseUpdateChecker(installed, minecraftVersion, fetch = {
-        val request = HttpRequest.newBuilder(URI.create("https://api.github.com/repos/johnceoskyblock/sparkling-mutuals/releases?per_page=100"))
+        val request = HttpRequest.newBuilder(URI.create("https://api.github.com/repos/1tsethan/sparkling-mutuals/releases?per_page=100"))
             .header("Accept", "application/vnd.github+json")
             .header("User-Agent", "Sparkling-Mutuals-Update-Check")
             .header("Cache-Control", "no-cache")

@@ -23,7 +23,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'ShipTools.ps1')
 
-$repository = 'johnceoskyblock/sparkling-mutuals'
+$repository = '1tsethan/sparkling-mutuals'
 $api = "repos/$repository"
 $temporary = $null
 $notes = $null

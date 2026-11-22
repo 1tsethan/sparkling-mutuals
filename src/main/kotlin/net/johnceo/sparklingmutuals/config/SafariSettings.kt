@@ -2,7 +2,6 @@ package net.johnceo.sparklingmutuals.config
 
 import net.johnceo.sparklingmutuals.compat.*
 import net.johnceo.sparklingmutuals.LocalChat
-import net.johnceo.sparklingmutuals.alerts.AlertManager
 import net.johnceo.sparklingmutuals.commands.CommandHelp
 import net.johnceo.sparklingmutuals.contest.ContestGui
 import net.johnceo.sparklingmutuals.history.importing.LogImporter
@@ -24,7 +23,7 @@ class SafariSettings {
     @JvmField @Category(name = "Party Interactions", desc = "") val party = Party()
     @JvmField @Category(name = "Miria contest", desc = "") val miria = Miria()
     @JvmField @Category(name = "History", desc = "") val history = History()
-    @JvmField @Category(name = "Sparkle Warping", desc = "") val warp = Warp()
+    val warp = Warp()
     @JvmField @Category(name = "Safari helpers", desc = "") val safari = Safari()
     @JvmField @Category(name = "HUDs", desc = "") val tracking = Tracking()
     @JvmField @Category(name = "API key", desc = "") val api = Api()
@@ -62,7 +61,7 @@ class SafariSettings {
     val miscEndgame get() = skyblock.endgame
     class SkyBlock {
         @JvmField @ConfigOption(name = "Helpers", desc = "") @Accordion val helpers = SkyBlockHelpers()
-        @JvmField @ConfigOption(name = "Endgame", desc = "") @Accordion val endgame = MiscEndgame()
+        val endgame = MiscEndgame()
     }
     class SkyBlockHelpers {
         @JvmField @ConfigOption(name = "Shard sale guidance", desc = "Compare sell offers, instant sales and salvaging for Safari shards.")
@@ -82,8 +81,7 @@ class SafariSettings {
     }
 
     class MiscEndgame {
-        @JvmField @ConfigOption(name = "Phantomleaf solver", desc = "Stand still to hear two notes. Move when the indicator turns yellow.")
-        @ConfigEditorBoolean var phantomleafSolver = ConfigManager.phantomleafSolver
+        var phantomleafSolver = ConfigManager.phantomleafSolver
     }
     class General {
         @JvmField @ConfigOption(name = "HUD font", desc = "") @Accordion
@@ -184,8 +182,7 @@ class SafariSettings {
         }
         @JvmField @ConfigOption(name = "Track Miria's contest", desc = "Track your score, bracket and ticket progress.")
         @ConfigEditorBoolean var enabled = ContestConfig.trackContest
-        @JvmField @ConfigOption(name = "Party contest entry guard", desc = "As party leader, wait for everyone to confirm their ticket in chat before entering Safari. Hold Shift to bypass for this contest.")
-        @ConfigEditorBoolean var autoContestDowntime = ContestConfig.autoContestDowntime
+        var autoContestDowntime = ContestConfig.autoContestDowntime
         @JvmField @ConfigOption(name = "Honeyhive beacons", desc = "Mark ready hives until you reach your ticket target.")
         @ConfigEditorBoolean var honeyHives = ConfigManager.honeyHives
         @JvmField val warning = Warning()
@@ -262,10 +259,8 @@ class SafariSettings {
         @ConfigEditorBoolean var leech = ConfigManager.leechMode
         @JvmField @ConfigOption(name = "Leech whitelist", desc = "Player names allowed to invite you. An empty list accepts nobody.")
         @ConfigEditorText var whitelist = ConfigManager.leechWhitelist
-        @JvmField @ConfigOption(name = "Auto-reconnect to Hypixel", desc = "Retry after an unexpected disconnect. Leave the disconnect screen to cancel.")
-        @ConfigEditorBoolean var autoReconnectHypixel = ConfigManager.autoReconnectHypixel
-        @JvmField @ConfigOption(name = "Auto-join SkyBlock", desc = "Return from the Prototype Lobby or Limbo. Also join SkyBlock after an automatic reconnect.")
-        @ConfigEditorBoolean var autoJoinSkyBlock = ConfigManager.autoJoinSkyBlock
+        var autoReconnectHypixel = ConfigManager.autoReconnectHypixel
+        var autoJoinSkyBlock = ConfigManager.autoJoinSkyBlock
         @JvmField @ConfigOption(name = "Reparty cutoff (seconds)", desc = "Stop auto-party invites and invite your saved party at this run time.")
         @ConfigEditorSlider(minValue=1f,maxValue=29f,minStep=1f) var reparty = ConfigManager.repartyDelaySeconds
         @JvmField @ConfigOption(name = "Auto-warp time (seconds)", desc = "Warp the party at this run time. Must be later than the reparty cutoff.")
@@ -280,13 +275,13 @@ class SafariSettings {
     class Safari {
         @JvmField @ConfigOption(name = "Safari re-entry cooldown", desc = "Show the 30-second wait after a failed attempt to rejoin the instance.")
         @Accordion val entryCooldown = HudOptions(ConfigManager.safariEntryCooldown,"entry_cooldown")
-        @JvmField @ConfigOption(name = "Safari entry", desc = "") @Accordion val entry = SafariEntrySettings()
+        val entry = SafariEntrySettings()
         @JvmField @ConfigOption(name = "Sparkling detection and alerts", desc = "") @Accordion val alerts = Alerts()
         @JvmField @ConfigOption(name = "Capture tools", desc = "") @Accordion val capture = SafariCaptureSettings()
-        @JvmField @ConfigOption(name = "Biome interactions", desc = "") @Accordion val interactions = SafariInteractionSettings()
+        val interactions = SafariInteractionSettings()
         @JvmField @ConfigOption(name = "Party visibility", desc = "") @Accordion val teammates = SafariTeammateSettings()
         @JvmField @ConfigOption(name = "Visual cleanup", desc = "") @Accordion val visibility = SafariVisibilitySettings()
-        @JvmField @ConfigOption(name = "Gambling", desc = "") @Accordion val gambling = SafariGamblingSettings()
+        val gambling = SafariGamblingSettings()
         var holdManagerOnKick
             get() = entry.holdManagerOnKick
             set(value) { entry.holdManagerOnKick = value }
@@ -352,12 +347,8 @@ class SafariSettings {
             set(value) { alerts.announce = value }
     }
     class SafariEntrySettings {
-        @JvmField @ConfigOption(name = "Wait for party before entry", desc = "Block entry while party members are missing or a kick is being handled. Hold Shift to bypass.")
-        @ConfigEditorBoolean var holdManagerOnKick = ConfigManager.holdManagerOnKick
-        @JvmField @ConfigOption(name = "Auto-select Safari ticket", desc = "Choose a ticket for non-leaders after they enter the Safari instance.")
-        @ConfigEditorBoolean var autoSelectTicket = ConfigManager.autoSelectSafariTicket
-        @JvmField @ConfigOption(name = "Preferred ticket", desc = "Use the closest available tier if your preferred ticket is missing.")
-        @ConfigEditorDropdown(values = ["First Class", "Basic"])
+        var holdManagerOnKick = ConfigManager.holdManagerOnKick
+        var autoSelectTicket = ConfigManager.autoSelectSafariTicket
         var ticketPreference = ConfigManager.safariTicketPreference
     }
     class SafariCaptureSettings {
@@ -369,27 +360,20 @@ class SafariSettings {
         @ConfigEditorSlider(minValue = 0f, maxValue = 40f, minStep = 1f) var doomLead = ConfigManager.doomspiralThrowLeadTicks
         @JvmField @ConfigOption(name="Throw timer appearance",desc="") @Accordion
         var doomAppearance=PanelAppearanceSettings(AppearanceConfig.panels.getValue("doom_throw")) { AppearanceConfig.selectedHex }
-        @JvmField @ConfigOption(name = "Capsule trajectory guide", desc = "Preview your capsule's flight path. Works best with view bobbing off.")
-        @ConfigEditorBoolean var experimentalCapsulePath = ConfigManager.experimentalCapsulePath
-        @JvmField @ConfigOption(name = "Guide line width", desc = "")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f) var capsulePathWidth = ConfigManager.capsulePathWidth
-        @JvmField @ConfigOption(name = "Show guide through blocks", desc = "")
-        @ConfigEditorBoolean var showCapsuleGuideThroughTerrain = ConfigManager.showCapsuleGuideThroughTerrain
-        @JvmField @ConfigOption(name = "Auto-click Rockmite mounds", desc = "Automatically left-click Rockmite mounds.")
-        @ConfigEditorBoolean var autoClicker = ConfigManager.autoClicker
+        var experimentalCapsulePath = ConfigManager.experimentalCapsulePath
+        var capsulePathWidth = ConfigManager.capsulePathWidth
+        var showCapsuleGuideThroughTerrain = ConfigManager.showCapsuleGuideThroughTerrain
+        var autoClicker = ConfigManager.autoClicker
     }
     class SafariInteractionSettings {
-        @JvmField @ConfigOption(name = "Auto-select podium gems", desc = "Select the matching gem while you hold right-click over a podium.")
-        @ConfigEditorBoolean var gemzieGemAutoSelect = ConfigManager.gemzieGemAutoSelect
-        @JvmField @ConfigOption(name = "Larger candle hitboxes", desc = "Use a full-block hitbox while holding Soothing Incense.")
-        @ConfigEditorBoolean var candleHitbox = ConfigManager.candleHitbox
-        @JvmField @ConfigOption(name = "Auto-accept Hideyho quest", desc = "Choose the accept option in Hideyho's dialogue.")
-        @ConfigEditorBoolean var hideyhoAutoAccept = ConfigManager.hideyhoAutoAccept
+        var gemzieGemAutoSelect = ConfigManager.gemzieGemAutoSelect
+        var candleHitbox = ConfigManager.candleHitbox
+        var hideyhoAutoAccept = ConfigManager.hideyhoAutoAccept
     }
     class SafariTeammateSettings {
-        @JvmField @ConfigOption(name = "Highlight teammates", desc = "Show party members through walls in Safari and Torrhus Canyon.")
+        @JvmField @ConfigOption(name = "Highlight teammates", desc = "Draw boxes around currently visible party members.")
         @ConfigEditorBoolean var highlightTeammates = ConfigManager.highlightTeammates
-        @JvmField @ConfigOption(name = "Show teammate names", desc = "Make party members' names visible through walls.")
+        @JvmField @ConfigOption(name = "Show teammate names", desc = "Label currently visible party members.")
         @ConfigEditorBoolean var showTeammateNames = ConfigManager.showTeammateNames
         @JvmField @ConfigOption(name = "Highlight color", desc = "")
         @ConfigEditorColour var color = SafariEspConfig.teammateColor
@@ -419,9 +403,7 @@ class SafariSettings {
         @ConfigEditorBoolean var doomspiral = ConfigManager.doomspiralLottery
     }
     class SafariVisibilitySettings {
-        @JvmField @ConfigOption(name = "Clear water", desc = "Apply the water opacity settings below in Safari.")
-        @ConfigEditorBoolean var clearWater = ConfigManager.clearWater
-        @JvmField @ConfigOption(name = "Water opacity by biome", desc = "0% is invisible; 100% is solid.") @Accordion
+        var clearWater = ConfigManager.clearWater
         val waterOpacity = WaterOpacitySettings()
         @JvmField @ConfigOption(name = "Hide Safari chat", desc = "")
         @ConfigEditorBoolean var hideCaptureChat = ConfigManager.hideCaptureChat
@@ -434,8 +416,7 @@ class SafariSettings {
         @JvmField @ConfigOption(name = "Capsule hiding distance (blocks)", desc = "")
         @ConfigEditorSlider(minValue = .5f, maxValue = 6f, minStep = .5f)
         var capsuleHideDistance = ConfigManager.capsuleHideDistance
-        @JvmField @ConfigOption(name = "Hide Haunted paintings", desc = "")
-        @ConfigEditorBoolean var paintings = ConfigManager.hideHauntedPaintings
+        var paintings = ConfigManager.hideHauntedPaintings
         @JvmField @ConfigOption(name = "Remove Safari darkness", desc = "Remove darkness from Haunted encounters.")
         @ConfigEditorBoolean var darkness = ConfigManager.removeDarkness
     }
@@ -550,8 +531,6 @@ class SafariSettings {
                 client.player?.sendSystemMessage(LocalChat.component(CommandHelp.localLines().joinToString("\n")))
             }
             4 -> client.execute { client.smSetScreen(ApiKeyScreen(client.smScreen)) }
-            5 -> { warp.reparty=22;warp.delay=27;saveDelay() }
-            6 -> saveDelay()
             7 -> { apply(); saveSound()
                 Identifier.tryParse(ContestConfig.contestSound)?.let { id ->
                     net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.getOptional(id).orElse(null)?.let { sound ->
@@ -563,20 +542,14 @@ class SafariSettings {
             9 -> { apply(); if (saveSparklingSound()) SparklingEncounters.playSound(client) }
             10 -> { apply(); client.execute { client.smSetScreen(HistoryScreen(client.smScreen)) } }
             13 -> { apply(); client.smSetScreen(CatchCelebrationPreviewScreen(client.smScreen ?: SafariConfigScreen(this))) }
-            12 -> { apply(); client.execute { client.smSetScreen(net.johnceo.sparklingmutuals.alerts.WarpListScreen(client.smScreen,
-                autoPartyChanged = { warp.autoParty = it }, onlineOnlyChanged = { warp.autoPartyOnlineOnly = it })) } }
             11 -> { apply(); client.execute {
                 client.smSetScreen(null)
                 LogImporter.runImport(LogImporter.defaultLogs())
             } }
         }
     }
-    fun isValidRunnable(id: Int) = id in 1..13
-    private fun saveDelay() {
-        val seconds=warp.delay.coerceIn(1,86400)
-        warp.reparty=ConfigManager.validRepartyDelay(warp.reparty,seconds)
-        AlertManager.setTimings(warp.reparty,seconds)
-    }
+    fun isValidRunnable(id: Int) = id in setOf(1,2,3,4,7,8,9,10,11,13)
+    private fun saveDelay() { /* Warping was removed from this edition. */ }
     private fun saveSound() {
         val sound = miria.sound.trim()
         if (Identifier.tryParse(sound) == null) feedback("Enter a valid Minecraft sound identifier.")
@@ -612,23 +585,6 @@ class SafariSettings {
         val bannerChanged = banner.apply() || fontChanged
         if (modes.unique.hideCritters || modes.unique.hideDrops) modes.unique.profitable=false
         if (modes.sparkling.hideCritters || modes.sparkling.hideDrops) modes.sparkling.profitable=false
-        val duoName=warp.duo.trim().takeIf { Regex("[A-Za-z0-9_]{1,16}").matches(it) }.orEmpty()
-        val whitelist=net.johnceo.sparklingmutuals.alerts.WarpList.parse(warp.whitelist).joinToString(" ")
-        val whitelistChanged=whitelist != ConfigManager.leechWhitelist
-        if (whitelistChanged) {
-            ConfigManager.leechWhitelist=whitelist
-            net.johnceo.sparklingmutuals.alerts.SparkleWarping.whitelistChanged()
-        }
-        if (warp.enabled && !ConfigManager.warpAlertsEnabled) warp.leech = false
-        if (warp.leech) warp.enabled = false
-        val warpModesChanged = net.johnceo.sparklingmutuals.alerts.SparkleWarping.setModes(warp.enabled, warp.leech)
-        val warpConfigurationChanged = warp.mode.coerceIn(0,1) != ConfigManager.sparkleWarpMode ||
-            duoName != ConfigManager.warpDuo
-        if (warpConfigurationChanged) {
-            ConfigManager.sparkleWarpMode=warp.mode.coerceIn(0,1)
-            ConfigManager.warpDuo=duoName
-            net.johnceo.sparklingmutuals.alerts.SparkleWarping.configurationChanged()
-        }
         val changes = listOf(ConfigManager::objectiveCaptureReminder to tracking.objectivesHud.captureReminder,ConfigManager::objectiveShinyReminder to tracking.objectivesHud.shinyReminder,
             ConfigManager::doomSoloPbChat to party.pbChat.doom.solo, ConfigManager::doomDuoPbChat to party.pbChat.doom.duo,
             ConfigManager::doomObservedSoloPbChat to party.pbChat.doom.observedSolo, ConfigManager::doomObservedDuoPbChat to party.pbChat.doom.observedDuo,
@@ -678,7 +634,7 @@ class SafariSettings {
         val splitTimeFormat = SplitTimeFormat.entries.getOrElse(tracking.splitsHud.timeFormat) { SplitTimeFormat.MILLISECONDS }
         val generalChanged = espChanged || modWideCrittersChanged || profitableCrittersChanged || alwaysOnCrittersChanged || alwaysOnFloorDropsChanged || chatTogglesChanged || objectivesChanged ||
             ConfigManager.splitsTimeFormat != splitTimeFormat ||
-            bannerChanged || ConfigManager.specialCatchStyle != safari.alerts.caughtStyle || whitelistChanged || warpModesChanged || warpConfigurationChanged || ConfigManager.doomspiralEmergenceTicks != safari.capture.doomTicks.coerceIn(1, 600) ||
+            bannerChanged || ConfigManager.specialCatchStyle != safari.alerts.caughtStyle || ConfigManager.doomspiralEmergenceTicks != safari.capture.doomTicks.coerceIn(1, 600) ||
             ConfigManager.doomspiralThrowLeadTicks != safari.capture.doomLead.coerceIn(0, 40) || ConfigManager.biomeWaterOpacity != waterOpacity || ConfigManager.capsulePathWidth != pathWidth || customizationChanged || changes.any { (property, value) -> property.get() != value } ||
             ConfigManager.safariTicketPreference != safari.ticketPreference || ConfigManager.showWhere != tracking.where || ConfigManager.capsuleHideDistance != distance ||
             ConfigManager.runCompleteVolume != safari.alerts.runVolume.coerceIn(0, 100) || ConfigManager.sparklingSoundVolume != safari.alerts.volume.coerceIn(0, 100)

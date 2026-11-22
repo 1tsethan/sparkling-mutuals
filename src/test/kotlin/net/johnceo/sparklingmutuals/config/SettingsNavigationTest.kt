@@ -29,7 +29,7 @@ class SettingsNavigationTest {
         assertTrue(rows.any { catalog.location(it)=="Safari → Modes → Unique mode" })
         assertTrue(rows.any { catalog.location(it)=="Safari → Modes → Full clear mode" })
         assertTrue(catalog.search("Safari Unique hide").any { it.name=="Hide critter ESP" })
-        assertTrue(catalog.search("Advanced SkyBlock Endgame").any { it.name=="Phantomleaf solver" })
+        assertTrue(catalog.search("Advanced SkyBlock Endgame").isEmpty())
     }
     @Test fun `search does not duplicate shared HUD appearance bindings`() {
         val catalog=SettingsCatalog(SafariSettings())

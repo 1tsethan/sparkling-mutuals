@@ -55,7 +55,7 @@ object HoneyHives {
         ClientReceiveMessageEvents.GAME.register { message, overlay ->
             if (!overlay) Minecraft.getInstance().execute { chat(SafariRules.strip(message.string)) }
         }
-        LevelRenderEvents.COLLECT_SUBMITS.register(::beams)
+        // A beacon above an unseen hive would reveal its location.
         WorldRenderCompat.register(::outlines)
     }
 
@@ -200,6 +200,7 @@ object HoneyHives {
             val animation = Math.floorMod(world.gameTime, 40L) + client.deltaTracker.getGameTimeDeltaPartialTick(false)
             val poses = context.poseStack()
             for ((hive, color) in visible) {
+                if (!net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(net.minecraft.core.BlockPos(hive.x,hive.y,hive.z), client)) continue
                 // Beams use RGB without alpha.
                 val rgb = if (color ushr 24 < 0xFF) (color and 0xFEFEFE) shr 1 else color and 0xFFFFFF
                 poses.pushPose()
@@ -221,8 +222,9 @@ object HoneyHives {
         fun box(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double, color: Int) =
             WorldRenderCompat.box(context, lines, net.minecraft.world.phys.AABB(minX, minY, minZ, maxX, maxY, maxZ), color)
         for ((hive, color) in visible) {
+            if (!net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(net.minecraft.core.BlockPos(hive.x,hive.y,hive.z), client)) continue
             box(hive.x.toDouble(), hive.y.toDouble(), hive.z.toDouble(), hive.x + 1.0, hive.y + 1.0, hive.z + 1.0, color)
-            if (beamsBroken) box(hive.x + .35, hive.y + 1.0, hive.z + .35, hive.x + .65, hive.y + 64.0, hive.z + .65, color)
+
         }
         WorldRenderCompat.flush(context, lines)
     }

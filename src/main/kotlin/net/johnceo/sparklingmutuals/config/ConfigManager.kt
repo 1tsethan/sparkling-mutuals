@@ -70,13 +70,22 @@ object ConfigManager {
     var fullClearHotspotAnnouncer = false
     var sparklingHotspotAnnouncer = false
     var timesaveOnly = true
-    var warpAlertsEnabled = false
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var warpAlertsEnabled: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var warpDelaySeconds = 27
     var repartyDelaySeconds = 22
     fun validRepartyDelay(value: Int?,warpSeconds: Int=warpDelaySeconds) =
         (value ?: 22).coerceIn(1,minOf(29,(warpSeconds-1).coerceAtLeast(1)))
-    var autoParty = false
-    var autoPartyOnlineOnly = false
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoParty: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoPartyOnlineOnly: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var sparkleWarpMode = 0
     var warpDuo = ""
     var settingsTheme = 4
@@ -84,22 +93,45 @@ object ConfigManager {
     var specialCatchAlert = true
     var alwaysCelebrateSparkling = false
     var specialCatchStyle = 0
-    var leechMode = false
-    var autoReconnectHypixel = false
-    var autoJoinSkyBlock = false
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var leechMode: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoReconnectHypixel: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoJoinSkyBlock: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var leechWhitelist = "JohnCEO _cj Rqach johnkuudra"
     var safariEntryCooldown = true
     var doomspiralThrowTimer = true
-    var doomspiralLottery = true
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var doomspiralLottery: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var doomspiralEmergenceTicks = 98
     var doomspiralThrowLeadTicks = 4
-    var hideyhoAutoAccept = true
-    var autoSelectSafariTicket = true
-    var safariEntryAutoEnter = false
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var hideyhoAutoAccept: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoSelectSafariTicket: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var safariEntryAutoEnter: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var safariTicketPreference = 0
     var profitsTicketMode = 0
     var hideyhoInsideOutside = true
-    var hideHauntedPaintings = true
+    var hideHauntedPaintings: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var shinyDetection = true
     var progressHud = true
     var splitsHud = true
@@ -123,7 +155,10 @@ object ConfigManager {
     var showSnooperWalls = true
     var showMoundStats = false
     var removeDarkness = true
-    var clearWater = true
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var clearWater: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var waterOpacity = 60
         set(value) { field = value.coerceIn(0, 100) }
     var biomeWaterOpacity: Map<SafariBiome, Int> = emptyMap()
@@ -142,10 +177,22 @@ object ConfigManager {
     var runCompleteVolume = 100
     var sparklingPartyAnnouncer = true
     var catchCountPanel = false
-    var autoClicker = true
-    var gemzieGemAutoSelect = true
-    var candleHitbox = true
-    var holdManagerOnKick = true
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var autoClicker: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var gemzieGemAutoSelect: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var candleHitbox: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var holdManagerOnKick: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var downtimeCommand = true
     var honeyHives = true
     var skillOverflow = true
@@ -156,7 +203,9 @@ object ConfigManager {
     var estimatedChestValue = true
     var huntingBoxValue = true
     var ubiksCubeTimer = false
-    var phantomleafSolver = true
+    var phantomleafSolver: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var runHistory = true
     var achievements = true
     var achievementSound = true
@@ -165,12 +214,19 @@ object ConfigManager {
     var hideCaptureChat = true
     var hideGroundCapsules = true
     var hideFlyingCapsules = true
-    var experimentalCapsulePath = true
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var experimentalCapsulePath: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var capsulePathWidth = 3f
-    var showCapsuleGuideThroughTerrain = true
+    // Inert compatibility binding: retired settings cannot enable code in this edition.
+    var showCapsuleGuideThroughTerrain: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
     var capsuleHideDistance = 2f
     var showWhere = 1
     val personalBests = SafariPersonalBests()
+    private val retiredSettings = setOf("phantomleafSolver","hideHauntedPaintings","autoClicker","autoJoinSkyBlock","autoParty","autoPartyOnlineOnly","autoReconnectHypixel","autoSelectSafariTicket","candleHitbox","clearWater","doomspiralLottery","experimentalCapsulePath","gemzieGemAutoSelect","hideyhoAutoAccept","holdManagerOnKick","leechMode","safariEntryAutoEnter","showCapsuleGuideThroughTerrain","warpAlertsEnabled","leechWhitelist","warpDelaySeconds","repartyDelaySeconds","sparkleWarpMode","warpDuo","safariTicketPreference")
     private val flags = mapOf(::safariEntryCooldown to true, ::hudSnapping to true, ::doomspiralThrowTimer to true, ::doomspiralLottery to true, ::autoParty to false, ::autoPartyOnlineOnly to false, ::autoBiomeReports to true, ::uniqueHideCritterEsp to false, ::uniqueHideFloorDropEsp to false,
         ::fullClearHideCritterEsp to false, ::fullClearHideFloorDropEsp to false, ::allScannableCritterChecks to false,
         ::sparklingHideCritterEsp to false, ::sparklingHideFloorDropEsp to false, ::announceStartingItems to false, ::hotspotAnnouncer to false, ::uniqueHotspotAnnouncer to false, ::fullClearHotspotAnnouncer to false, ::sparklingHotspotAnnouncer to false, ::highlightTeammates to true, ::showTeammateNames to true, ::partyCommandsEnabled to true, ::useCloudApi to true, ::fullClearMode to false, ::sparklingMode to false, ::sparklingProfitableShardEsp to true, ::profitableShardEsp to true, ::timesaveOnly to true, ::warpAlertsEnabled to false,
@@ -198,6 +254,7 @@ object ConfigManager {
         val existing = Files.exists(configPath)
         val properties = if (existing) Properties() else FreshInstallDefaults.main()
         if (existing) Files.newInputStream(configPath).use(properties::load)
+        retiredSettings.forEach(properties::remove)
         val savedVersions = InstalledVersionHistory.load(properties)
         installedVersionHistory = savedVersions.launch(installedVersion, !existing, recoverPreviousVersion)
         val versionChanged = installedVersionHistory != savedVersions
@@ -210,8 +267,6 @@ object ConfigManager {
         }
         val updateWarpTimings = properties.getProperty("migration.sparkleWarpTimers22_27") != "true"
         if(updateWarpTimings) {
-            properties.setProperty("warpDelaySeconds","27")
-            properties.setProperty("repartyDelaySeconds","22")
             properties.setProperty("migration.sparkleWarpTimers22_27","true")
         }
         settingsTheme = properties.getProperty("settingsTheme")?.toIntOrNull()?.coerceIn(0,33) ?: 4
@@ -226,7 +281,7 @@ object ConfigManager {
         runCompleteSound = properties.getProperty("runCompleteSound")?.trim()?.let(Identifier::tryParse)?.toString() ?: "minecraft:block.bell.use"
         runCompleteVolume = properties.getProperty("runCompleteVolume")?.toIntOrNull()?.coerceIn(0, 100) ?: 100
         sparklingSoundVolume = properties.getProperty("sparklingSoundVolume")?.toIntOrNull()?.coerceIn(0, 100) ?: 100
-        flags.forEach { (property, default) -> property.set(properties.getProperty(property.name)?.toBooleanStrictOrNull() ?: default) }
+        flags.filterKeys { it.name !in retiredSettings }.forEach { (property, default) -> property.set(properties.getProperty(property.name)?.toBooleanStrictOrNull() ?: default) }
         if (!properties.containsKey("hotspotAnnouncer")) hotspotAnnouncer = uniqueHotspotAnnouncer || fullClearHotspotAnnouncer || sparklingHotspotAnnouncer
         if (uniqueHideCritterEsp || uniqueHideFloorDropEsp) profitableShardEsp=false
         if (sparklingHideCritterEsp || sparklingHideFloorDropEsp) sparklingProfitableShardEsp=false
@@ -288,23 +343,23 @@ object ConfigManager {
             setProperty("runCompleteVolume", runCompleteVolume.coerceIn(0, 100).toString())
             setProperty("sparklingSound", validSparklingSound(sparklingSound))
             setProperty("sparklingSoundVolume", sparklingSoundVolume.coerceIn(0, 100).toString())
-            flags.forEach { (property, _) -> setProperty(property.name, property.get().toString()) }
+            flags.filterKeys { it.name !in retiredSettings }.forEach { (property, _) -> setProperty(property.name, property.get().toString()) }
             setProperty("migration.shardSaleGuidanceV2", "true")
             setProperty("migration.sparkleWarpTimers22_27","true")
-            setProperty("warpDelaySeconds", warpDelaySeconds.toString())
-            setProperty("repartyDelaySeconds",validRepartyDelay(repartyDelaySeconds).toString())
-            setProperty("sparkleWarpMode", sparkleWarpMode.toString())
-            setProperty("warpDuo", warpDuo)
+
+
+
+
             setProperty("settingsTheme", settingsTheme.toString())
             setProperty("splitsTimeFormat", splitsTimeFormat.name)
             setProperty("specialCatchAlert", specialCatchAlert.toString())
             setProperty("alwaysCelebrateSparkling", alwaysCelebrateSparkling.toString())
             setProperty("specialCatchStyle", specialCatchStyle.toString())
-            setProperty("leechMode", leechMode.toString())
-            setProperty("leechWhitelist", leechWhitelist)
+
+
             setProperty("doomspiralEmergenceTicks", doomspiralEmergenceTicks.coerceIn(1, 600).toString())
             setProperty("doomspiralThrowLeadTicks", doomspiralThrowLeadTicks.coerceIn(0, 40).toString())
-            setProperty("safariTicketPreference", safariTicketPreference.coerceIn(0, 1).toString())
+
             setProperty("profitsTicketMode", profitsTicketMode.coerceIn(0, 3).toString())
             setProperty("showWhere", showWhere.coerceIn(0, 2).toString())
             setProperty("waterOpacity", waterOpacity.toString())
@@ -313,7 +368,7 @@ object ConfigManager {
             }
             setProperty("capsuleHideDistance", validCapsuleDistance(capsuleHideDistance).toString())
             setProperty("capsulePathWidth", validCapsulePathWidth(capsulePathWidth).toString())
-            net.johnceo.sparklingmutuals.alerts.WarpList.save(this)
+
             SafariHud.save(this)
             SafariEspConfig.save(this)
             SafariChatConfig.save(this)

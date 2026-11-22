@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-REPOSITORY = 'johnceoskyblock/sparkling-mutuals'
+REPOSITORY = '1tsethan/sparkling-mutuals'
 SECRET = 'a' * 64
 READ_TOKEN = 'ghs_12345_' + ('a-_' * 60) + '.' + ('b' * 180) + '.' + ('c' * 180)
 STAMP = '1700000000'

@@ -26,12 +26,12 @@ concurrency:
 jobs:
   notify:
     if: >-
-      github.repository == 'johnceoskyblock/sparkling-mutuals' &&
+      github.repository == '1tsethan/sparkling-mutuals' &&
       ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_repository.full_name == 'johnceoskyblock/sparkling-mutuals' &&
+      github.event.workflow_run.head_repository.full_name == '1tsethan/sparkling-mutuals' &&
       ((github.event.workflow_run.name == 'build' && github.event.workflow_run.head_branch == 'master') ||
       github.event.workflow_run.name == 'release')))
     runs-on: ubuntu-24.04
@@ -46,7 +46,7 @@ jobs:
         shell: python
         run: |
           import hashlib, hmac, json, os, re, time, urllib.request, urllib.parse
-          repository = "johnceoskyblock/sparkling-mutuals"
+          repository = "1tsethan/sparkling-mutuals"
           with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as stream:
               event = json.load(stream)
           if (os.environ.get("GITHUB_REPOSITORY") != repository

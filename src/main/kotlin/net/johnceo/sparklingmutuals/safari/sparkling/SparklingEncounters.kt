@@ -41,21 +41,23 @@ class SparklingNotices {
 }
 
 class SparklingMemory {
-    private val alerted = mutableSetOf<String>()
+    private val alerted = net.johnceo.sparklingmutuals.safari.visibility.VisibleDiscoveryMemory()
     private val announced = mutableSetOf<String>()
     private fun key(id: UUID, name: String?) = when (name) {
         // Moving particles can create new location UUIDs; they share one notification per run.
         SparklingAlert.UNKNOWN -> "particle:unknown"
         else -> name?.let(net.johnceo.sparklingmutuals.safari.SafariRoster::named)?.name ?: id.toString()
     }
-    fun alert(id: UUID, enabled: Boolean, name: String? = null) = enabled && alerted.add(key(id, name))
+    fun alerted(id: UUID, name: String?) = alerted.contains(key(id, name))
+    fun alert(id: UUID, enabled: Boolean, name: String? = null) = alerted.first(key(id, name), enabled)
     fun announce(id: UUID, enabled: Boolean, name: String? = null) = enabled && name != SparklingAlert.UNKNOWN && announced.add(key(id, name))
-    fun reset() { alerted.clear(); announced.clear() }
+    fun reset() { alerted.reset(); announced.clear() }
 }
 
 /** CritterMod v0.9.0 SparklingWatch behaviour, with paced announcements and per-run deduplication. */
 object SparklingEncounters {
     private val memory = SparklingMemory()
+    private val visibility = mutableMapOf<UUID, () -> Boolean>()
     private val queue = SparklingNotices()
     private var banner: SparklingNotice? = null
     private var shownAt = 0L
@@ -91,37 +93,30 @@ object SparklingEncounters {
         if (clearParticle) queuedParticle = null
     }
     fun observe(id: UUID, name: String, biome: SafariBiome, pos: BlockPos, unknown: Boolean = false,
-                alreadyAlertedByParticle: Boolean = false) {
+                alreadyAlertedByParticle: Boolean = false, visible: () -> Boolean = { false }) {
+        visibility[id] = visible
+        if (!visible() || unknown) return
         val previouslyShared = !unknown && net.johnceo.sparklingmutuals.sync.SafariPartySync.found(name)
-        if (!unknown && !previouslyShared) net.johnceo.sparklingmutuals.alerts.SparkleAutoParty.detected(name)
         val where = "${biome.label} ${pos.x} ${pos.y} ${pos.z}"
         val notice = SparklingNotice(id, name, where, unknown)
-        if (!previouslyShared) requestAlert(notice, alreadyAlertedByParticle)
+        requestAlert(notice, false)
         if (!unknown && !previouslyShared && memory.announce(id, ConfigManager.sparklingPartyAnnouncer, name)) queue.add(notice)
     }
     private fun requestAlert(notice: SparklingNotice, alreadyAlertedByParticle: Boolean = false) {
-        if (memory.alert(notice.id, ConfigManager.sparklingAlert, notice.name)) {
-            if (DoomspiralLottery.active && notice.name == "Doomspiral") {
-                if (alreadyAlertedByParticle) {
-                    net.johnceo.sparklingmutuals.hud.SafariAlertSequence.queue.clear(this) { it == SparklingAlert.UNKNOWN }
-                    queuedParticle = null
-                }
-                enqueue(notice)
-            } else if (!alreadyAlertedByParticle) enqueue(notice)
-            else if (queuedParticle != null) queuedParticle = notice
-            else banner = notice
-        }
+        if (visibility[notice.id]?.invoke() != true) return
+        if (ConfigManager.sparklingAlert && !memory.alerted(notice.id, notice.name)) enqueue(notice)
     }
     private fun enqueue(notice: SparklingNotice) {
         val world = Minecraft.getInstance().level
         val alerts = net.johnceo.sparklingmutuals.hud.SafariAlertSequence.queue
         if (notice.unknown) queuedParticle = notice
         alerts.submit(this, 7_000, notice.name, valid = {
-            ConfigManager.sparklingAlert && Minecraft.getInstance().level === world &&
+            visibility[notice.id]?.invoke() == true && ConfigManager.sparklingAlert && Minecraft.getInstance().level === world &&
                 (SafariAssist.inSafari || net.johnceo.sparklingmutuals.safari.SafariIsland.onIsland)
         }, finish = { banner = null }) {
             banner = if (notice.unknown) queuedParticle ?: notice else notice
             if (notice.unknown) queuedParticle = null
+            memory.alert(notice.id, true, notice.name)
             shownAt = System.currentTimeMillis()
             sound = playSound(Minecraft.getInstance())
         }
@@ -133,18 +128,14 @@ object SparklingEncounters {
             return
         }
         val now = System.currentTimeMillis()
-        if (now - sentAt >= 1500) queue.next()?.let { PartyManager.sendPartyChat(client, "${it.message()}"); sentAt = now }
+        if (now - sentAt >= 1500) queue.next()?.let { if (visibility[it.id]?.invoke() == true) { PartyManager.sendPartyChat(client, "${it.message()}"); sentAt = now } }
     }
     fun render(graphics: GuiGraphicsExtractor) {
         if (!ConfigManager.sparklingAlert) return
         val client = Minecraft.getInstance()
-        if (useTicket && !net.johnceo.sparklingmutuals.hud.SafariAlertSequence.queue.busy) {
-            val text = "Party sparkling found. Use a Safari ticket to join."
-            graphics.text(HudFonts.font, text, (client.window.guiScaledWidth - HudFonts.font.width(text)) / 2,
-                client.window.guiScaledHeight / 4, HudRow.GOLD, HudFonts.shadow)
-        }
         if (!SafariAssist.inSafari && !net.johnceo.sparklingmutuals.safari.SafariIsland.onIsland) return
         val notice = banner ?: return
+        if (visibility[notice.id]?.invoke() != true) return
         val name = notice.name
         val where = notice.where
         val remaining = 7000 - (System.currentTimeMillis() - shownAt)
@@ -193,6 +184,7 @@ object SparklingEncounters {
 
     fun reset() {
         leave()
+        visibility.clear()
         memory.reset()
         sentAt = 0
     }

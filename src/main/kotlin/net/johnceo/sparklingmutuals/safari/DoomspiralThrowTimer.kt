@@ -87,7 +87,8 @@ object DoomspiralThrowTimer {
         val player = client.player ?: return
         val level = client.level ?: return
         if (level.getEntitiesOfClass(Warden::class.java, player.boundingBox.inflate(10.0)) {
-                !it.isRemoved && it.isAlive && player.distanceToSqr(it) <= 100.0
+                !it.isRemoved && it.isAlive && player.distanceToSqr(it) <= 100.0 &&
+                    net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.entity(it, client)
             }.isEmpty()) return
         panel(ticks).draw(graphics, SafariHud.DOOM_THROW)
     }

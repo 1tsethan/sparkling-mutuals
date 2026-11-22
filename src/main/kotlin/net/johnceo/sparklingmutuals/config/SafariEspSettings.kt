@@ -227,9 +227,9 @@ class FloorDropScaleSettings {
 }
 
 class EspGeneralSettings(limits: EspBiomeSettings,val drops: FloorDropEspSettings) {
-    @JvmField @ConfigOption(name = "Critter glow outlines", desc = "Outline the critter's model. Can be used with boxes.") @ConfigEditorBoolean
+    @JvmField @ConfigOption(name = "Visible critter highlights", desc = "Draw depth-tested boxes around currently visible critters.") @ConfigEditorBoolean
     var glow=SafariEspConfig.critterGlow
-    @JvmField @ConfigOption(name = "Critter boxes", desc = "Draw a box around each highlighted critter. Can be used with glow outlines.") @ConfigEditorBoolean
+    @JvmField @ConfigOption(name = "Critter boxes", desc = "Draw terrain-occluded boxes around currently visible eligible critters.") @ConfigEditorBoolean
     var boxes=SafariEspConfig.critterBoxes
     @JvmField @ConfigOption(name = "Critter visibility by biome", desc = "Choose whether each biome's critters are shown only while you are in that biome.") @Accordion val biomes=limits
     @JvmField @ConfigOption(name = "Floor drops outside your biome", desc = "Enable an item to show its ESP from other biomes.") @Accordion val floorVisibility=drops.visibility

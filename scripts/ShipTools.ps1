@@ -63,7 +63,7 @@ function Assert-ShipAssets($Assets,[string]$Version) {
     }
     foreach ($asset in $Assets) {
         if ($asset.size -le 0 -or $asset.digest -notmatch '^sha256:[a-f0-9]{64}$' -or
-            !$asset.browser_download_url.StartsWith("https://github.com/johnceoskyblock/sparkling-mutuals/releases/download/v$Version/")) {
+            !$asset.browser_download_url.StartsWith("https://github.com/1tsethan/sparkling-mutuals/releases/download/v$Version/")) {
             throw "Invalid public asset metadata: $($asset.name)"
         }
     }

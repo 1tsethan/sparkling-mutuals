@@ -91,12 +91,6 @@ object SparklingCommand {
                         .executes { open { HistoryScreen(null) } })
                     .then(ClientCommands.literal("debug").executes { context ->
                         SafariEsp.debug(Minecraft.getInstance())
-                        net.johnceo.sparklingmutuals.safari.automation.entry.CjsSafariEntry.debug().forEach {
-                            org.slf4j.LoggerFactory.getLogger("sparkling-mutuals/cj-entry-dryrun").info(it)
-                        }
-                        net.johnceo.sparklingmutuals.safari.automation.SafariManagerGuard.debug().forEach {
-                            org.slf4j.LoggerFactory.getLogger("sparkling-mutuals/entry-guard").info(it)
-                        }
                         BeeNests.debug(Minecraft.getInstance())
                         HoneyHives.debug(Minecraft.getInstance())
                         val message = if (net.johnceo.sparklingmutuals.debug.SafariDeveloper.enabled) {

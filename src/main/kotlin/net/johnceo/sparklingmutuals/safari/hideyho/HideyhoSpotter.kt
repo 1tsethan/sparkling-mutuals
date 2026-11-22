@@ -99,16 +99,15 @@ class HideyhoLocationWatch {
             HideyhoHiding.found(text) && armed -> { armedAt = null; hidingAnnounced = true }
         }
     }
-    fun settled(spot: HideyhoHiding.Spot?, now: Long): HideyhoHiding.Spot? {
+    fun settled(spot: HideyhoHiding.Spot?, now: Long, commit: Boolean = true): HideyhoHiding.Spot? {
         if (!active) return null
         if (armedAt?.let { now - it > 90_000L } == true) { armedAt = null; return null }
         if (spot == null) return null
         if (armed) {
             if (spot == spotBefore) return null
-            armedAt = null
-            hidingAnnounced = true
+            if (commit) { armedAt = null; hidingAnnounced = true }
         } else if (announced != null || hidingAnnounced) return null
-        announced = spot
+        if (commit) announced = spot
         return spot
     }
     fun reset() { active = false; armedAt = null; spotBefore = null; announced = null; hidingAnnounced = false }
@@ -171,10 +170,12 @@ object HideyhoSpotter {
         if (++ticks < if (watch.armed) SCAN_TICKS else IDLE_TICKS) return
         ticks = 0
         val spot = position(knownOnly = watch.armed)
-        watch.settled(spot, System.currentTimeMillis())?.let { spot ->
+        watch.settled(spot, System.currentTimeMillis(), commit = false)?.let { spot ->
             val location = if (HideyhoHiding.inside(spot)) "Inside" else "Outside"
             logger.info("Hideyho location: {} ({})", spot, location)
-            SafariBanners.fire(kind, SafariBiome.HAUNTED, location = location)
+            SafariBanners.fire(kind, SafariBiome.HAUNTED, location = location, visible = {
+                position(knownOnly = true) == spot
+            }, onStart = { watch.settled(spot, System.currentTimeMillis()) })
         }
     }
 

@@ -26,7 +26,7 @@ abstract class PublishReleaseTask : DefaultTask() {
         val env = System.getenv()
         val version = modVersion.get()
         require(env["CI"] == "true" && env["GITHUB_EVENT_NAME"] == "push" && env["GITHUB_REF"] == "refs/tags/v$version" &&
-            env["GITHUB_REPOSITORY"] == "johnceoskyblock/sparkling-mutuals") { "Publishing is restricted to this repository's matching tag-push workflow" }
+            env["GITHUB_REPOSITORY"] == "1tsethan/sparkling-mutuals") { "Publishing is restricted to this repository's matching tag-push workflow" }
         val sha = requireNotNull(env["GITHUB_SHA"])
         require(sha.matches(Regex("[a-f0-9]{40}"))) { "Missing immutable workflow commit" }
         val targets = targetProperties.get().map { (target, props) ->
@@ -67,7 +67,7 @@ private class GitHubReleaseTransport(private val token: String) : ReleaseTranspo
 
 internal class GitHubReleaseApi(private val commit: String, private val transport: ReleaseTransport) : ReleaseApi {
     constructor(token: String, commit: String) : this(commit, GitHubReleaseTransport(token))
-    private val repository = "johnceoskyblock/sparkling-mutuals"
+    private val repository = "1tsethan/sparkling-mutuals"
     private val root = "https://api.github.com/repos/$repository"
     private val knownReleases = mutableMapOf<String, Long>()
     private val releaseKinds = mutableMapOf<Long, Boolean>()

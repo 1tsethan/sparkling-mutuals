@@ -11,26 +11,6 @@ import java.nio.file.Path
 class HypixelRecoveryTest {
     @TempDir lateinit var directory: Path
 
-    @Test fun recoverySwitchesAreOptInAndSaveIndependently() {
-        ConfigManager.init(directory)
-        val settings = SafariSettings()
-        assertFalse(settings.warp.autoReconnectHypixel)
-        assertFalse(settings.warp.autoJoinSkyBlock)
-
-        settings.warp.autoReconnectHypixel = true
-        settings.apply()
-        ConfigManager.init(directory)
-        assertTrue(ConfigManager.autoReconnectHypixel)
-        assertFalse(ConfigManager.autoJoinSkyBlock)
-
-        SafariSettings().apply {
-            warp.autoReconnectHypixel = false
-            warp.autoJoinSkyBlock = true
-        }.apply()
-        ConfigManager.init(directory)
-        assertFalse(ConfigManager.autoReconnectHypixel)
-        assertTrue(ConfigManager.autoJoinSkyBlock)
-    }
 
     @Test fun limboRoutesThroughPrototypeAndMainLobbyRequiresReconnect() {
         assertEquals("lobby prototype", HypixelLobby.fromLocation("limbo", null, null)?.skyBlockCommand(false))

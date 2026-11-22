@@ -45,11 +45,11 @@ object WorldRenderCompat {
                     .setNormal(pose,line.normal.x.toFloat(),line.normal.y.toFloat(),line.normal.z.toFloat()).setLineWidth(width)
         }
     }
-    fun renderType(name: String, filled: Boolean = false, cull: Boolean? = false, depth: WorldDepthMode = WorldDepthMode.THROUGH_TERRAIN, afterShaders: Boolean = false): RenderType {
+    fun renderType(name: String, filled: Boolean = false, cull: Boolean? = false, depth: WorldDepthMode = WorldDepthMode.OCCLUDED, afterShaders: Boolean = false): RenderType {
         val builder = RenderPipeline.builder(
             if (filled) RenderPipelines.DEBUG_FILLED_SNIPPET else RenderPipelines.LINES_SNIPPET)
             .withLocation(SparklingMutuals.id("pipeline/$name"))
-            .withDepthStencilState(DepthStencilState(if(depth==WorldDepthMode.OCCLUDED) DepthStencilState.DEFAULT.depthTest() else CompareOp.ALWAYS_PASS, false))
+            .withDepthStencilState(DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false))
         // 26.3's line snippet leaves color targets to its caller; filled geometry already supplies one.
         //? if >=26.3 {
         /*if (!filled) builder.withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
@@ -148,6 +148,7 @@ object WorldRenderCompat {
     private fun labelComponent(context: LevelRenderContext, shown: Component, color: Int, x: Double, y: Double, z: Double,
         scale: Float, background: Int, shadow: Boolean) {
         val client = Minecraft.getInstance()
+        if (!net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.position(Vec3(x,y,z), client)) return
         val camera = client.gameRenderer.smCamera
         val pos = camera.position()
         val poses = context.poseStack()
@@ -161,11 +162,11 @@ object WorldRenderCompat {
         poses.scale(scale, -scale, scale)
         //? if >=26.2 {
         /*context.submitNodeCollector().submitText(poses, -client.font.width(shown) / 2f, 0f,
-            shown.visualOrderText, shadow, Font.DisplayMode.SEE_THROUGH,
+            shown.visualOrderText, shadow, Font.DisplayMode.NORMAL,
             LightCoordsUtil.FULL_BRIGHT, color, background, 0)
         *///? } else {
         client.font.drawInBatch(shown.visualOrderText, -client.font.width(shown) / 2f, 0f, color, shadow,
-            Matrix4f(poses.last().pose()), context.bufferSource(), Font.DisplayMode.SEE_THROUGH, background, LightCoordsUtil.FULL_BRIGHT)
+            Matrix4f(poses.last().pose()), context.bufferSource(), Font.DisplayMode.NORMAL, background, LightCoordsUtil.FULL_BRIGHT)
         //? }
         poses.popPose()
     }

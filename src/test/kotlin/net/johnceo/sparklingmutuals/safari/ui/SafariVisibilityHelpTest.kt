@@ -52,7 +52,7 @@ class SafariVisibilityHelpTest {
     @Test fun `local help contains only slash commands with brief descriptions`() {
         val lines = CommandHelp.localLines(SafariMode.UNIQUE).map(SafariRules::strip)
         assertTrue(lines.drop(1).all { it.startsWith("/") && !it.contains("!") })
-        for (command in listOf("/sm", "/sm gui", "/captures", "/fc", "/unique", "/warping", "/warpingdelay", "/autoparty", "/apikey")) {
+        for (command in listOf("/sm", "/sm gui", "/captures", "/fc", "/unique", "/apikey")) {
             assertTrue(lines.any { it.startsWith(command) && it.contains(" — ") }, command)
         }
     }

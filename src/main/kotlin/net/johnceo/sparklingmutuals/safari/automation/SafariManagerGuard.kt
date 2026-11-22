@@ -26,7 +26,7 @@ object SafariManagerGuard {
     private var requestedRosterAt = 0L
     private var messagedAt = 0L
     private var lastDecision = ""
-    fun register() { SafariPartyInput.register(); SafariTicketSelect.register() }
+    fun register() { SafariPartyInput.register() }
     fun activeRun(client: Minecraft): Boolean {
         val player = client.player ?: return false
         return runState.active(client.level, SafariIsland.onIsland, SafariAssist.location,

@@ -116,7 +116,8 @@ object SafariAssist {
                     particles.identify(label.x, label.y, label.z))
             } == true
             if (SafariTracking.ledger.current?.sparklingCaptures?.resolved(identity) == true) return@mapNotNull null
-            SparklingEncounters.observe(identity, match.species, biome, body.blockPosition(), alreadyAlertedByParticle = alreadyAlerted)
+            SparklingEncounters.observe(identity, match.species, biome, body.blockPosition(), alreadyAlertedByParticle = false,
+                visible = { net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(body, label, client) })
             Shiny(label, body, match.species, biome, identity)
         }.sortedBy { player.distanceToSqr(it.body) }
         SafariTracking.ledger.current?.sparklingParticles?.recentUnknown(System.currentTimeMillis())?.forEach { point ->
@@ -147,7 +148,7 @@ object SafariAssist {
         val client = Minecraft.getInstance()
         val player = client.player ?: return false
         return !ConfigManager.hideCritterEsp() && ConfigManager.shinyDetection && visualsActive(client) && shinies.any {
-            !it.body.isRemoved && (it.body.id == id || it.label.id == id) &&
+            net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(it.body,it.label,client) && (it.body.id == id || it.label.id == id) &&
                 net.johnceo.sparklingmutuals.config.SafariEspConfig.modWideEnabled(it.name)
         }
     }
@@ -164,7 +165,7 @@ object SafariAssist {
         val client = Minecraft.getInstance()
         if (preview) return HudPanel("Detected sparklings", rows = listOf(HudRow("Doomspiral", "32m", SafariRoster.color("Doomspiral"))))
         val player = client.player ?: return null
-        val nearby = shinies.filter { !it.body.isRemoved }
+        val nearby = shinies.filter { net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(it.body,it.label,client) }
         if (nearby.isEmpty()) return null
         val rows = nearby.take(6).map { HudRow(it.name, "${it.biome.label} ${sqrt(player.distanceToSqr(it.body)).toInt()}m", SafariRoster.color(it.name), HudRow.WHITE) }.toMutableList()
         if (nearby.size > 6) rows.add(HudRow("+${nearby.size - 6} more sightings", color = HudRow.GRAY))

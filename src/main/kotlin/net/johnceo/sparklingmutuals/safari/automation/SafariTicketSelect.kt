@@ -3,7 +3,6 @@ package net.johnceo.sparklingmutuals.safari.automation
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
-import net.johnceo.sparklingmutuals.safari.automation.entry.CjsSafariEntry
 import net.minecraft.client.gui.screens.Screen
 import net.johnceo.sparklingmutuals.compat.smScreen
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -37,11 +36,6 @@ object SafariTicketSelect {
             (SafariRules.isSafari(lines) || SafariRules.isEntrance(lines) || lines.isEmpty() && SafariIsland.isSafari(mode))
 
     internal fun entryMenu(title: String) = SafariRules.strip(title).trim().equals("Critter Safari Entry",true)
-    private fun syncSession(client: Minecraft) {
-        if (world !== client.level || connection !== client.connection) {
-            reset(); world=client.level; connection=client.connection
-        }
-    }
     internal fun validParty(known: Boolean, leaderKnown: Boolean, size: Int, localLeader: Boolean) =
         known && leaderKnown && size > 1 && !localLeader
 
@@ -56,36 +50,6 @@ object SafariTicketSelect {
         return locationAllows(client) && validParty(PartyManager.hasInfo,
             PartyManager.getMembers().any(PartyManager::isLeader),
             PartyManager.withLocal(player.uuid.toString())?.size ?: 0, PartyManager.isLeader(player.uuid.toString()))
-    }
-
-    fun register() {
-        ScreenEvents.AFTER_INIT.register { _, screen, _, _ ->
-            ScreenKeyboardEvents.allowKeyPress(screen).register { _, _ -> CjsSafariEntry.manualInput();true }
-            if (screen is AbstractContainerScreen<*>) ScreenMouseEvents.allowMouseClick(screen).register { _, _ ->
-                CjsSafariEntry.manualInput()
-                val hidden=hideScreen(screen)
-                // A visible menu belongs to the user once they begin clicking it.
-                if (!hidden && entryMenu(screen.title.string) && contextAllows(Minecraft.getInstance())) {
-                    clicked=true; revealed=true
-                }
-                !hidden
-            }
-        }
-    }
-    private fun observeMenu(current: Any, now: Long) {
-        if (current !== menu) { menu = current; shownAt = now; clicked = false; revealed = false }
-    }
-    /** Keep the real menu open for its normal guarded click; suppress only its presentation. */
-    fun hideScreen(screen: Screen): Boolean {
-        val client = Minecraft.getInstance()
-        val now = System.currentTimeMillis()
-        syncSession(client)
-        if (CjsSafariEntry.suppressesAutomaticMenu(client)) return false
-        if (!contextAllows(client) || client.smScreen !== screen || screen !is AbstractContainerScreen<*> ||
-            !entryMenu(screen.title.string)) return false
-        observeMenu(client.player!!.containerMenu, now)
-        // Reveal on server rejection/slow data rather than leave the user facing an invisible menu.
-        return !revealed && now - shownAt < 2000
     }
 
     internal fun available(lines: List<String>): Boolean? {
@@ -128,33 +92,4 @@ object SafariTicketSelect {
         // Preload the roster; opening the entry menu itself is the trigger.
         if (locationAllows(client) && !PartyManager.hasInfo) PartyManager.requestPartyInfo()
     }
-    fun tick(client: Minecraft) {
-        val now = System.currentTimeMillis()
-        syncSession(client)
-        if (CjsSafariEntry.suppressesAutomaticMenu(client)) { revealed=true; return }
-        if (!ConfigManager.autoSelectSafariTicket) { reset(); return }
-        val player = client.player ?: return
-        val screen = client.smScreen as? AbstractContainerScreen<*> ?: run {
-            menu=null; clicked=false; revealed=false; return
-        }
-        if (!entryMenu(screen.title.string) || !locationAllows(client)) return
-        if (!PartyManager.hasInfo || PartyManager.getMembers().none(PartyManager::isLeader)) PartyManager.requestPartyInfo()
-        if (!contextAllows(client)) return
-        val current = player.containerMenu
-        observeMenu(current, now)
-        if (clicked || now - shownAt < 250 || now - lastAttempt < 250) return
-        val options = options(client)
-        if (options.map { it.tier }.toSet().size != SafariTicketType.entries.size) return
-        val option = choose(options, ConfigManager.safariTicketPreference) ?: run {
-            if (options.all { it.available != null }) revealed = true
-            return
-        }
-        lastAttempt = now
-        if (SafariManagerGuard.shouldBlockEntry(current.containerId, option.slot)) { revealed = true; return }
-        val gameMode = client.gameMode ?: return
-        clicked = true
-        // The normal packet path performs the entry guard again before sending.
-        gameMode.handleContainerInput(current.containerId, option.slot, 0, ContainerInput.PICKUP, player)
-    }
-    private fun reset() { world = null; connection = null; menu = null; clicked = false; revealed = false; shownAt = 0; lastAttempt = 0 }
 }
