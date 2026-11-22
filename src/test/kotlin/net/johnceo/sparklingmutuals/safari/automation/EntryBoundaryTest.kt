@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.inventory.ContainerInput
@@ -130,3 +131,4 @@ class EntryBoundaryTest {
         }
     }
 }
+*///? }

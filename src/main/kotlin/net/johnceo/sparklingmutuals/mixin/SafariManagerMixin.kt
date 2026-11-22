@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.automation.SafariManagerGuard
 import net.minecraft.client.multiplayer.MultiPlayerGameMode
@@ -47,3 +48,4 @@ class SafariManagerMixin {
         if (SafariManagerGuard.shouldBlockTicket(player, hand)) info.returnValue = InteractionResult.FAIL
     }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.alerts.HypixelRecovery
 import net.minecraft.client.gui.screens.DisconnectedScreen
@@ -25,3 +26,4 @@ abstract class HypixelDisconnectMixin {
         HypixelRecovery.disconnected(serverData, screen, details.reason())
     }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import com.mojang.blaze3d.platform.InputConstants
 import net.johnceo.sparklingmutuals.compat.smScreen
@@ -156,3 +157,4 @@ class CjsApproachInput {
 
 internal fun cjsSdlMouseDown(mask: Int, button: Int): Boolean =
     button in 1..32 && mask and (1 shl (button-1)) != 0
+*///? }

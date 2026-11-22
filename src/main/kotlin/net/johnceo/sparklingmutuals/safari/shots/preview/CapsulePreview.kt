@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.shots.preview
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.shots.preview
 
 import net.johnceo.sparklingmutuals.compat.*
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -73,3 +74,4 @@ object CapsulePreview {
         return rules.evaluate(state)
     }
 }
+*///? }

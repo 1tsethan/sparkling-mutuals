@@ -57,9 +57,13 @@ function Wait-ShipWorkflow([string]$Workflow,[string]$Sha,[string]$Branch,[strin
     } while ($true)
 }
 function Assert-ShipAssets($Assets,[string]$Version) {
-    $expected = @('26.1.2','26.2','26.3' | ForEach-Object { "sparkling-mutuals-$Version+mc$_.jar" })
-    if (@($Assets).Count -ne 3 -or @(Compare-Object ($Assets.name | Sort-Object) ($expected | Sort-Object)).Count) {
-        throw 'Release must contain exactly the three expected Minecraft JARs.'
+    $expected = @('build-manifest.json')
+    foreach ($target in '26.1.2','26.2','26.3') {
+        $expected += "sparkling-mutuals-$Version+mc$target.jar"
+        $expected += "sparkling-mutuals-full-noautoupdate-$Version+mc$target.jar"
+    }
+    if (@($Assets).Count -ne $expected.Count -or @(Compare-Object ($Assets.name | Sort-Object) ($expected | Sort-Object)).Count) {
+        throw 'Release must contain exactly the six expected Minecraft JARs and the verified manifest.'
     }
     foreach ($asset in $Assets) {
         if ($asset.size -le 0 -or $asset.digest -notmatch '^sha256:[a-f0-9]{64}$' -or

@@ -42,7 +42,9 @@ object HoneyHives {
     private var ticks = 0
     private var level: Any? = null
     private var onTorrhus = false
-    private var beamsBroken = false
+//? if extended {
+/*    private var beamsBroken = false
+*///? }
     private val file get() = ConfigStorage.directory.resolve("sparkling-mutuals-honeyhives.properties")
 
     private val lines = WorldRenderCompat.renderType("honeyhive_lines")
@@ -55,7 +57,9 @@ object HoneyHives {
         ClientReceiveMessageEvents.GAME.register { message, overlay ->
             if (!overlay) Minecraft.getInstance().execute { chat(SafariRules.strip(message.string)) }
         }
-        LevelRenderEvents.COLLECT_SUBMITS.register(::beams)
+//? if extended {
+/*        LevelRenderEvents.COLLECT_SUBMITS.register(::beams)
+*///? }
         WorldRenderCompat.register(::outlines)
     }
 
@@ -167,7 +171,8 @@ object HoneyHives {
         if (changed) save()
     }
 
-    /** Log raw label carriers as well as interpreted state to diagnose server data changes. */
+//? if extended {
+/*    /** Log raw label carriers as well as interpreted state to diagnose server data changes. */
     fun debug(client: Minecraft) {
         val world = client.level ?: return
         val player = client.player ?: return
@@ -188,10 +193,12 @@ object HoneyHives {
                     entity.id, entity.type.toShortString(), entity.x, entity.y, entity.z, raw, HoneyHiveLabels.statusLines(raw))
         }
     }
+*///? }
 
     // ------------------------------------------------------------------ drawing
 
-    private fun beams(context: LevelRenderContext) {
+//? if extended {
+/*    private fun beams(context: LevelRenderContext) {
         val client = Minecraft.getInstance()
         val world = client.level ?: return
         if (world !== level || !ConfigManager.honeyHives || visible.isEmpty() || beamsBroken) return
@@ -200,6 +207,9 @@ object HoneyHives {
             val animation = Math.floorMod(world.gameTime, 40L) + client.deltaTracker.getGameTimeDeltaPartialTick(false)
             val poses = context.poseStack()
             for ((hive, color) in visible) {
+//? if standard {
+                if (!net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(net.minecraft.core.BlockPos(hive.x,hive.y,hive.z), client)) continue
+//? }
                 // Beams use RGB without alpha.
                 val rgb = if (color ushr 24 < 0xFF) (color and 0xFEFEFE) shr 1 else color and 0xFFFFFF
                 poses.pushPose()
@@ -214,15 +224,22 @@ object HoneyHives {
             logger.warn("Beacon beams unavailable, drawing columns instead", e)
         }
     }
-
+*///? }
     private fun outlines(context: LevelRenderContext) {
         val client = Minecraft.getInstance()
         if (client.level == null || client.level !== level || !ConfigManager.honeyHives || client.options.smHideGui || visible.isEmpty()) return
         fun box(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double, color: Int) =
             WorldRenderCompat.box(context, lines, net.minecraft.world.phys.AABB(minX, minY, minZ, maxX, maxY, maxZ), color)
         for ((hive, color) in visible) {
+//? if standard {
+            if (!net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(net.minecraft.core.BlockPos(hive.x,hive.y,hive.z), client)) continue
+//? }
             box(hive.x.toDouble(), hive.y.toDouble(), hive.z.toDouble(), hive.x + 1.0, hive.y + 1.0, hive.z + 1.0, color)
-            if (beamsBroken) box(hive.x + .35, hive.y + 1.0, hive.z + .35, hive.x + .65, hive.y + 64.0, hive.z + .65, color)
+//? if extended {
+/*            if (beamsBroken) box(hive.x + .35, hive.y + 1.0, hive.z + .35, hive.x + .65, hive.y + 64.0, hive.z + .65, color)
+*///? } else {
+
+//? }
         }
         WorldRenderCompat.flush(context, lines)
     }

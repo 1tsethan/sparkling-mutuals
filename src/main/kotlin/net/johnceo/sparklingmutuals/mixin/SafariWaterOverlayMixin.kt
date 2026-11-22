@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation
@@ -36,3 +37,4 @@ class SafariWaterOverlayMixin {
     }
     //? }
 }
+*///? }

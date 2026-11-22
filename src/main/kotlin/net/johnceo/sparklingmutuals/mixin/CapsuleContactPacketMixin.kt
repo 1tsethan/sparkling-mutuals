@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.shots.preview.contacts.CapsuleContactUpdates
 import net.minecraft.client.multiplayer.ClientPacketListener
@@ -30,3 +31,4 @@ class CapsuleContactPacketMixin {
     @Inject(method=["handleRemoveEntities"],at=[At("TAIL")])
     private fun removed(packet:ClientboundRemoveEntitiesPacket,info:CallbackInfo) { CapsuleContactUpdates.packet(packet) }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import java.nio.file.Path
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -72,3 +73,4 @@ class ClearWaterTest {
         } finally { ConfigManager.waterOpacity=previous }
     }
 }
+*///? }

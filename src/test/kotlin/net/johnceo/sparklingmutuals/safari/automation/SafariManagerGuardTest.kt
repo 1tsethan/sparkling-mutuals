@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.johnceo.sparklingmutuals.safari.SafariIsland
 import org.junit.jupiter.api.Assertions.*
@@ -48,3 +49,4 @@ class SafariManagerGuardTest {
         assertFalse(SafariIsland.isSafari(null))
     }
 }
+*///? }

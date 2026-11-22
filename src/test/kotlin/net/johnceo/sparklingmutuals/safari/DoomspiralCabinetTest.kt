@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -62,3 +63,4 @@ class DoomspiralCabinetTest {
         assertEquals(0f, DoomspiralCabinet.scale(320, -1))
     }
 }
+*///? }

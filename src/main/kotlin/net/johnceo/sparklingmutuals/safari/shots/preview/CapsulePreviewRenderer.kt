@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.shots.preview
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.shots.preview
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.systems.RenderSystem
@@ -64,3 +65,4 @@ object CapsulePreviewRenderer {
         WorldRenderCompat.flush(context,type)
     }
 }
+*///? }

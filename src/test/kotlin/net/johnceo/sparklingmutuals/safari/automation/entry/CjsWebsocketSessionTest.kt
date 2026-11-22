@@ -12,7 +12,8 @@ class CjsWebsocketSessionTest {
     private fun frame(room: PartyRoomDiscoveries, epoch: Long=7)=CjsEntryFrame(c,
         room.snapshot(epoch)?.let { CjsRoomSignal(c,it.generation,it.active) },1,true,0,true,true,false,
         true,true,false,false,target,true,true,CjsApproachOutcome.COMPLETE,null)
-    @Test fun `socket capture between menu proposal and dispatch prevents ticket and keeps ownership`() {
+//? if extended {
+/*    @Test fun `socket capture between menu proposal and dispatch prevents ticket and keeps ownership`() {
         val room=PartyRoomDiscoveries();room.welcome(7,true);room.receive(7,"536870912,0,0,0")
         val flow=CjsEntryFlow();val inputs=mutableListOf<String>()
         val manager=flow.tick(frame(room),6000)!!
@@ -25,6 +26,7 @@ class CjsWebsocketSessionTest {
         flow.tick(frame(room).copy(enabled=false,menu=menu),6200)
         assertTrue(flow.suppressesAutomaticMenus)
     }
+*///? }
     @Test fun `welcome and historical local reports are insufficient without current atomic data`() {
         val room=PartyRoomDiscoveries();room.welcome(7,true)
         val flow=CjsEntryFlow()

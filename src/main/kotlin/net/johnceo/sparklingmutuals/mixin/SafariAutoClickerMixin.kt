@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.automation.AutoClicker
 import net.minecraft.client.Minecraft
@@ -12,3 +13,4 @@ class SafariAutoClickerMixin {
     @Inject(method = ["handleKeybinds"], at = [At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0)])
     private fun clicks(info: CallbackInfo) { AutoClicker.prepare(Minecraft.getInstance()) }
 }
+*///? }

@@ -33,11 +33,12 @@ abstract class PublishReleaseTask : DefaultTask() {
             val (fabric, hm) = props.split('|')
             TargetSpec(target, fabric, hm)
         }
-        val files = verifyDistribution(distributionDirectory.get().asFile.listFiles()!!.filter { it.extension == "jar" }.map { it.toPath() }, targets, version)
+        val distribution = verifyCollectedDistribution(distributionDirectory.get().asFile.toPath(), targets, version)
+        val githubJars = distribution.jars.filter { it.edition in githubEditions }
         val token = requireNotNull(env["GITHUB_TOKEN"]?.takeIf { it.isNotBlank() }) { "Missing GitHub token" }
         val api = GitHubReleaseApi(token, sha)
         api.verifyTag("v$version")
-        val decision = publishVerifiedRelease(api, "v$version", version, files)
+        val decision = publishVerifiedRelease(api, "v$version", version, githubJars, distribution.manifest)
         logger.lifecycle("Release v$version: $decision")
     }
 }
@@ -148,10 +149,11 @@ internal class GitHubReleaseApi(private val commit: String, private val transpor
     override fun generatedNotes(tag: String): String = obj(request("POST", "$root/releases/generate-notes", jsonBody(mapOf("tag_name" to tag, "target_commitish" to commit))))["body"] as String
     override fun updateBody(id: Long, body: String) { request("PATCH", "$root/releases/$id", jsonBody(mapOf("body" to body))) }
     override fun deleteAsset(id: Long) { request("DELETE", "$root/releases/assets/$id") }
-    override fun upload(id: Long, file: VerifiedJar): ReleaseAsset {
+    override fun upload(id: Long, file: VerifiedAsset): ReleaseAsset {
         val name = URLEncoder.encode(file.path.fileName.toString(), StandardCharsets.UTF_8)
+        val contentType = if (file is VerifiedJar) "application/java-archive" else "application/json"
         return asset(request("POST", "https://uploads.github.com/repos/$repository/releases/$id/assets?name=$name",
-            HttpRequest.BodyPublishers.ofFile(file.path), "application/java-archive"))
+            HttpRequest.BodyPublishers.ofFile(file.path), contentType))
     }
     override fun publish(id: Long) {
         val prerelease = requireNotNull(releaseKinds[id]) { "Release classification must be read before publication" }

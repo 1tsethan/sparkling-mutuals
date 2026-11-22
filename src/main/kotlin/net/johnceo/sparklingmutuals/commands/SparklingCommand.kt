@@ -39,7 +39,8 @@ object SparklingCommand {
 
     fun register() {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            if (net.johnceo.sparklingmutuals.debug.SafariDeveloper.enabled) {
+//? if extended {
+/*            if (net.johnceo.sparklingmutuals.debug.SafariDeveloper.enabled) {
                 dispatcher.register(ClientCommands.literal("testing").executes {
                     val message = runCatching {
                         net.johnceo.sparklingmutuals.debug.SafariDeveloper.toggleTesting(Minecraft.getInstance())
@@ -51,6 +52,7 @@ object SparklingCommand {
                     1
                 })
             }
+*///? }
             val historyTabs = mapOf(
                 HistoryScreen.Tab.BESTS to listOf("best", "bests"),
                 HistoryScreen.Tab.SPARKLINGS to listOf("sparkling", "sparklings"),
@@ -90,7 +92,8 @@ object SparklingCommand {
                             .executes { LogImporter.runImport(LogImporter.defaultLogs()); 1 })
                         .executes { open { HistoryScreen(null) } })
                     .then(ClientCommands.literal("debug").executes { context ->
-                        SafariEsp.debug(Minecraft.getInstance())
+//? if extended {
+/*                        SafariEsp.debug(Minecraft.getInstance())
                         net.johnceo.sparklingmutuals.safari.automation.entry.CjsSafariEntry.debug().forEach {
                             org.slf4j.LoggerFactory.getLogger("sparkling-mutuals/cj-entry-dryrun").info(it)
                         }
@@ -109,6 +112,13 @@ object SparklingCommand {
                                     "[SM] Could not save developer snapshot. See latest.log."
                                 })
                         } else "[SM] Entity, nest and honeyhive diagnostics saved to latest.log."
+*///? } else {
+                        val logger = org.slf4j.LoggerFactory.getLogger("sparkling-mutuals/debug")
+                        logger.info("Party sync: {}", net.johnceo.sparklingmutuals.sync.SafariPartySync.diagnostics())
+                        logger.info("Safari run active: {}, mode: {}",
+                            net.johnceo.sparklingmutuals.safari.SafariTracking.ledger.current != null, SafariFullClear.mode)
+                        val message = "[SM] Party sync and run diagnostics saved to latest.log."
+//? }
                         context.source.sendFeedback(LocalChat.component(message))
                         1
                     })

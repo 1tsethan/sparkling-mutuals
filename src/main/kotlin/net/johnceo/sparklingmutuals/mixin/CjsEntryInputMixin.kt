@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.automation.entry.CjsSafariEntry
 import net.minecraft.client.KeyboardHandler
@@ -26,3 +27,4 @@ class CjsEntryMouseMixin {
         CjsSafariEntry.gameplayInput(window,action)
     }
 }
+*///? }

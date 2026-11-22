@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.alerts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.alerts
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -43,3 +44,4 @@ class WarpListDefaultsTest {
         assertTrue(WarpList.names("Cavernfish").isEmpty())
     }
 }
+*///? }

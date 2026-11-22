@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.alerts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.alerts
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -113,3 +114,4 @@ object SparkleAutoParty {
     private fun returningPhase(now: Long)=SparkleWarpPolicy.returningPhase(windowStartedAt,now,ConfigManager.repartyDelaySeconds)
     fun stop() { invitations.stop(); joined.clear(); run = null; level = null; connection = null;windowStartedAt=0;returningInvites.reset() }
 }
+*///? }

@@ -31,7 +31,8 @@ object ContestTracker {
     private var selectedTicketMode = ContestConfig.ticketMode
     private val ticketNotices = ContestTicketState()
 
-    private val downtime = ContestDowntimeState()
+//? if extended {
+/*    private val downtime = ContestDowntimeState()
     private val waiting = linkedSetOf<String>()
     private var contestStartedAt = 0L
     private var reminderAt: Long? = null
@@ -74,7 +75,11 @@ object ContestTracker {
         val others = otherMembers(self)
         return waiting.filter { it in others }
     }
-
+*///? } else {
+    fun clearPartyContest() = Unit
+    fun confirmPartyTicket(id: String, receivedAt: Long) = Unit
+    fun contestWaiting(): List<String> = emptyList()
+//? }
     private var tickCounter = 0
     private var windowKey = -1L
     private var secondsIntoWindow = 0
@@ -112,11 +117,13 @@ object ContestTracker {
     fun onClientTick(client: Minecraft) {
         if (client.player == null || client.level == null) return
 
-        val now = System.currentTimeMillis()
-        if (net.johnceo.sparklingmutuals.safari.automation.SafariManagerGuard.activeRun(client)) {
+//? if extended {
+/*        val now = System.currentTimeMillis()
+        if (net.johnceo.sparklingmutuals.safari.automation.SafariEntryRunObservation.activeRun(client)) {
             returnedFromSafari = true
             reminderAt = null
         }
+*///? }
         if (++tickCounter < 10) return
         tickCounter = 0
 
@@ -125,10 +132,11 @@ object ContestTracker {
             selectedTicketMode = ContestConfig.ticketMode
             complete = false; completedWindow = -1L; warnedMinutes.clear()
         }
-        val self = client.player!!.uuid.toString()
+        val skyblock = SkyblockSidebar.inSkyblock(client)
+//? if extended {
+/*        val self = client.player!!.uuid.toString()
         val leader = PartyManager.isLeader(self)
         val others = otherMembers(self)
-        val skyblock = SkyblockSidebar.inSkyblock(client)
         if ((PartyManager.hasInfo && !leader) || !ContestConfig.autoContestDowntime || betweenContests()) clearPartyContest()
         if (PartyManager.hasInfo) waiting.retainAll(others.toSet())
         if (downtime.poll(windowKey, secondsIntoWindow, ContestConfig.autoContestDowntime,
@@ -152,6 +160,7 @@ object ContestTracker {
             val deadline = reminderAt ?: (now + 30_000).also { reminderAt = it }
             if (now >= deadline) remindWaiting(client)
         }
+*///? }
         if (skyblock) {
             readSidebar(client)
             announceTicket(client)
@@ -159,12 +168,13 @@ object ContestTracker {
         if (ContestConfig.trackContest) maybeWarn(client)
     }
 
-    private fun remindWaiting(client: Minecraft) {
+//? if extended {
+/*    private fun remindWaiting(client: Minecraft) {
         val names = waiting.take(3).map { SafariPartyInput.nameOf(it) ?: return }
         reminded = PartyManager.sendPartyChat(client,
             "${names.joinToString(", ")}, still waiting on ticket earned confirmation message (Send message containing \"r\" or \"ticket\").")
     }
-
+*///? }
     /** The contest window a time of day falls in. */
     fun windowAt(time: LocalTime): Long =
         (Math.floorMod(time.toSecondOfDay() - FIRST_START_MINUTE * 60, 86400) / WINDOW_SECONDS).toLong()

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue
 import com.llamalad7.mixinextras.sugar.Local
@@ -16,3 +17,4 @@ class SafariWaterSurfaceMixin {
     private fun transparentWater(color: Int, @Local(argsOnly=true) fluid: FluidState, @Local(argsOnly = true) pos: BlockPos): Int =
         ClearWater.surfaceColorAt(color, fluid.`is`(FluidTags.WATER), pos)
 }
+*///? }

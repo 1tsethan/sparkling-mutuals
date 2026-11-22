@@ -104,7 +104,11 @@ class SafariFeatureIntegrationTest {
         assertFalse(splits.borderEnabled)
         assertEquals(20, splits.transparency)
         assertEquals(0, splits.backgroundArgb and 0xFFFFFF)
-        assertEquals(42, ConfigManager.warpDelaySeconds)
+//? if extended {
+/*        assertEquals(42, ConfigManager.warpDelaySeconds)
+*///? } else {
+        assertEquals(27, ConfigManager.warpDelaySeconds)
+//? }
         assertEquals(2, ConfigManager.showWhere)
         assertFalse(ConfigManager.runCoinsInstaSell)
         assertFalse(ConfigManager.achievementsToParty)

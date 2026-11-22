@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import net.johnceo.sparklingmutuals.config.ConfigManager
 import net.minecraft.client.Minecraft
@@ -41,3 +42,4 @@ object ClearWater {
     }
     fun reset() { enabledInWorld = false; opacity = Opacity() }
 }
+*///? }

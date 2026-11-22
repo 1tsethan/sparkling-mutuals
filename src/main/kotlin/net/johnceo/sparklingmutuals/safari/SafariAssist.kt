@@ -116,7 +116,12 @@ object SafariAssist {
                     particles.identify(label.x, label.y, label.z))
             } == true
             if (SafariTracking.ledger.current?.sparklingCaptures?.resolved(identity) == true) return@mapNotNull null
-            SparklingEncounters.observe(identity, match.species, biome, body.blockPosition(), alreadyAlertedByParticle = alreadyAlerted)
+//? if extended {
+/*            SparklingEncounters.observe(identity, match.species, biome, body.blockPosition(), alreadyAlertedByParticle = alreadyAlerted)
+*///? } else {
+            SparklingEncounters.observe(identity, match.species, biome, body.blockPosition(), alreadyAlertedByParticle = false,
+                visible = { net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(body, label, client) })
+//? }
             Shiny(label, body, match.species, biome, identity)
         }.sortedBy { player.distanceToSqr(it.body) }
         SafariTracking.ledger.current?.sparklingParticles?.recentUnknown(System.currentTimeMillis())?.forEach { point ->
@@ -124,14 +129,17 @@ object SafariAssist {
                 net.johnceo.sparklingmutuals.sync.SafariPartySync.hasOutstandingSharedSparkling(point.biome)) {
                 point.identified = true
             }
-            else
+//? if extended {
+/*            else
                 SparklingEncounters.observeUnknown(point.id, point.biome,
                     net.minecraft.core.BlockPos.containing(point.x, point.y, point.z))
+*///? }
         }
         SparklingEncounters.tick(client)
     }
 
-    fun diagnostics(): List<String> {
+//? if extended {
+/*    fun diagnostics(): List<String> {
         val player = Minecraft.getInstance().player ?: return emptyList()
         return SafariTracking.ledger.current?.sparklingParticles?.unknown().orEmpty().map {
             "Sparkling detection: source=wax_on species=unknown biome=${it.biome} pos=(${it.x}, ${it.y}, ${it.z}) lastSeen=${it.seenAt}"
@@ -139,6 +147,7 @@ object SafariAssist {
             "source=${if (it.label.customName?.string?.let(SafariRules::sparklingSpecies) != null) "name" else "skin"} " +
             "body=${it.body.uuid} label=${it.label.uuid} distance=${sqrt(player.distanceToSqr(it.body)).toInt()}m" }
     }
+*///? }
     internal fun visualsActive(client: Minecraft = Minecraft.getInstance()) =
         SafariIsland.onIsland && inSafari && client.level != null && client.level === lastLevel
 
@@ -147,7 +156,11 @@ object SafariAssist {
         val client = Minecraft.getInstance()
         val player = client.player ?: return false
         return !ConfigManager.hideCritterEsp() && ConfigManager.shinyDetection && visualsActive(client) && shinies.any {
-            !it.body.isRemoved && (it.body.id == id || it.label.id == id) &&
+//? if extended {
+/*            !it.body.isRemoved && (it.body.id == id || it.label.id == id) &&
+*///? } else {
+            net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(it.body,it.label,client) && (it.body.id == id || it.label.id == id) &&
+//? }
                 net.johnceo.sparklingmutuals.config.SafariEspConfig.modWideEnabled(it.name)
         }
     }
@@ -164,7 +177,11 @@ object SafariAssist {
         val client = Minecraft.getInstance()
         if (preview) return HudPanel("Detected sparklings", rows = listOf(HudRow("Doomspiral", "32m", SafariRoster.color("Doomspiral"))))
         val player = client.player ?: return null
-        val nearby = shinies.filter { !it.body.isRemoved }
+//? if extended {
+/*        val nearby = shinies.filter { !it.body.isRemoved }
+*///? } else {
+        val nearby = shinies.filter { net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.sighting(it.body,it.label,client) }
+//? }
         if (nearby.isEmpty()) return null
         val rows = nearby.take(6).map { HudRow(it.name, "${it.biome.label} ${sqrt(player.distanceToSqr(it.body)).toInt()}m", SafariRoster.color(it.name), HudRow.WHITE) }.toMutableList()
         if (nearby.size > 6) rows.add(HudRow("+${nearby.size - 6} more sightings", color = HudRow.GRAY))

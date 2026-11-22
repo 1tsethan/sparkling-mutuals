@@ -13,7 +13,12 @@ stonecutter {
     kotlinController = true
     centralScript = "build.gradle.kts"
     create(rootProject) {
-        versions("26.1.2", "26.2", "26.3")
+        val targets = listOf("26.1.2", "26.2", "26.3")
+        versions(targets)
+        for (target in targets) {
+            version("$target-full", target)
+            version("$target-noauto", target)
+        }
         vcsVersion = "26.1.2"
     }
 }

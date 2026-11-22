@@ -176,7 +176,7 @@ object SafariDowntime {
         if (!ConfigManager.downtimeCommand && (active || requests.isNotEmpty())) clear()
         releaseContestTravel(System.currentTimeMillis())
         if (client.player == null || client.connection == null || !PartyManager.hasInfo) return
-        val inSafari = SafariManagerGuard.activeRun(client)
+        val inSafari = SafariEntryRunObservation.activeRun(client)
         if (!inSafari) leftSafari(client.player?.name?.string.orEmpty())?.let(::queueAnnouncement)
         val inCanyon = !inSafari && client.player != null && client.level != null &&
             (net.johnceo.sparklingmutuals.safari.SafariIsland.currentMode.equals("foraging_3", true) ||

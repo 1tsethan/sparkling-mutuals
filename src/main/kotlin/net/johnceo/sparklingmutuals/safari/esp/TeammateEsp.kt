@@ -12,6 +12,9 @@ import net.minecraft.world.entity.player.Player
 
 /** Noamm-style outlines and distance-scaled names, using SkyBlock party UUIDs rather than dungeon classes. */
 object TeammateEsp {
+//? if standard {
+    private val lines = WorldRenderCompat.renderType("visible_teammates")
+//? }
     val COLOR get() = SafariEspConfig.rgb(SafariEspConfig.teammateColor)
     private var nextRosterRequest = 0L
 
@@ -34,13 +37,21 @@ object TeammateEsp {
 
     fun isTeammate(entity: Entity): Boolean {
         val client = Minecraft.getInstance()
-        return entity is Player && !entity.isRemoved && client.level?.getEntity(entity.id) === entity &&
+//? if extended {
+/*        return entity is Player && !entity.isRemoved && client.level?.getEntity(entity.id) === entity &&
+*///? } else {
+        return entity is Player && net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.entity(entity, client) && !entity.isRemoved && client.level?.getEntity(entity.id) === entity &&
+//? }
             TeammateEspRules.eligible(inSupportedArea(client), PartyManager.hasInfo,
                 entity.uuid, client.player?.uuid, PartyManager.getMembers())
     }
     fun register() {
         WorldRenderCompat.register { context ->
-            if (!ConfigManager.showTeammateNames) return@register
+//? if extended {
+/*            if (!ConfigManager.showTeammateNames) return@register
+*///? } else {
+            if (!ConfigManager.showTeammateNames && !ConfigManager.highlightTeammates) return@register
+//? }
             val client = Minecraft.getInstance()
             val world = client.level ?: return@register
             if (!PartyManager.hasInfo || !inSupportedArea(client)) return@register
@@ -48,12 +59,19 @@ object TeammateEsp {
                 val delta = client.deltaTracker.getGameTimeDeltaPartialTick(false)
             for (player in world.players()) {
                 if (!isTeammate(player)) continue
+//? if standard {
+                if (ConfigManager.highlightTeammates) WorldRenderCompat.box(context, lines, player.boundingBox, COLOR)
+                if (!ConfigManager.showTeammateNames) continue
+//? }
                 val pos = player.getPosition(delta)
                 val distance = pos.distanceTo(camera)
                 val scale = (SafariEspConfig.teammateLabelWorldScale * TeammateEspRules.nameScale(distance)).toFloat()
                 val text = player.gameProfile.name
                 WorldRenderCompat.label(context, text, COLOR, pos.x, pos.y + player.bbHeight + .7 + distance * .015, pos.z, scale)
             }
+//? if standard {
+            WorldRenderCompat.flush(context, lines)
+//? }
         }
     }
 }

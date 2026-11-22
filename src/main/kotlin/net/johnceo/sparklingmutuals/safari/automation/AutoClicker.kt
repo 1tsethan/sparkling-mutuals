@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.johnceo.sparklingmutuals.compat.*
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -35,3 +36,4 @@ object AutoClicker {
     }
     fun reset() { clock.tick(false) }
 }
+*///? }

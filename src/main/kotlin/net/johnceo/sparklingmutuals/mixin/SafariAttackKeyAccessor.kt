@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.minecraft.client.Minecraft
 import org.spongepowered.asm.mixin.Mixin
@@ -9,3 +10,4 @@ import org.spongepowered.asm.mixin.gen.Invoker
 interface SafariAttackKeyAccessor {
     @Invoker("startAttack") fun sparklingAttack(): Boolean
 }
+*///? }

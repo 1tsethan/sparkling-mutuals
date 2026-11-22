@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit
 
 class PartyDiscoveryCacheTest {
     private val provider = ApiProvider.capture("", true)
-    @Test fun `warping disbands retain cached discoveries and expected leecher requirements without repeated HTTP`() {
+//? if extended {
+/*    @Test fun `warping disbands retain cached discoveries and expected leecher requirements without repeated HTTP`() {
         val cache=PartyDiscoveryCache()
         val party=linkedSetOf("me","leechA","leechB","leechC")
         cache.select(party,provider)
@@ -37,7 +38,7 @@ class PartyDiscoveryCacheTest {
         cache.clear()
         assertTrue(cache.retainedMembers(provider).isEmpty())
     }
-
+*///? }
     @Test fun `delayed profile observations cannot cross membership provider or account realm resets`() {
         val cache = PartyDiscoveryCache()
         assertNull(cache.observationToken("me", provider))

@@ -29,9 +29,18 @@ internal class UpdateDetailsScreen(private val parent: Screen, private val highl
     private var thumbHeight=0
     private var dragging=false
     private var grab=0.0
+    //? if updater {
+    /*private var autoButton: Button? = null
+    private var downloadButton: Button? = null
+    *///? }
     private val left get()=(width-(width-32).coerceAtMost(740))/2
     private val right get()=width-left
-    private val notesBottom get() = highlightsPage?.layout?.contentBottom ?: height-52
+    private val notesBottom get() = highlightsPage?.layout?.contentBottom ?:
+        //? if updater {
+        /*(height - 80)
+        *///? } else {
+        (height - 52)
+        //? }
     private val trackX get() = highlightsPage?.layout?.trackX ?: right-7
     override fun init() {
         dragging=false
@@ -44,9 +53,23 @@ internal class UpdateDetailsScreen(private val parent: Screen, private val highl
                 .bounds(page.layout.buttonRight - 124, page.layout.buttonY, 124, 22).build())
             return
         }
-        ModUpdates.check(force=true)
-        addRenderableWidget(Button.builder(Component.literal("GitHub releases")) {
-            ConfirmLinkScreen.confirmLinkNow(this,java.net.URI.create(ModUpdates.REPOSITORY+"/releases"))
+        //? if updater {
+        /*ModUpdates.check(force = true)
+        autoButton = addRenderableWidget(Button.builder(Component.empty()) { ModUpdates.toggleAutoUpdate() }
+            .bounds(left, height - 62, 128, 22).build())
+        downloadButton = addRenderableWidget(Button.builder(Component.empty()) { ModUpdates.download() }
+            .bounds(left + 134, height - 62, 128, 22).build())
+        updateControls()
+        *///? }
+        //? if standard {
+        val channelName = "Modrinth"
+        val channelUrl = "https://modrinth.com/discover/mods?q=Sparkling+Mutuals"
+        //? } else {
+        /*val channelName = "GitHub releases"
+        val channelUrl = ModUpdates.REPOSITORY + "/releases"
+        *///? }
+        addRenderableWidget(Button.builder(Component.literal(channelName)) {
+            ConfirmLinkScreen.confirmLinkNow(this,java.net.URI.create(channelUrl))
         }.bounds(left,height-34,130,22).build())
         addRenderableWidget(Button.builder(Component.literal("Back")) { onClose() }
             .bounds(right-60,height-34,60,22).build())
@@ -55,7 +78,25 @@ internal class UpdateDetailsScreen(private val parent: Screen, private val highl
         highlights?.let { ConfigManager.acknowledgeReleaseHighlights(it.installed) }
         minecraft.smSetScreen(parent)
     }
-    override fun tick() { if (highlights == null) ModUpdates.check() }
+    //? if updater {
+    /*override fun tick() {
+        if (highlights == null) {
+            ModUpdates.check()
+            updateControls()
+        }
+    }
+
+    private fun updateControls() {
+        autoButton?.apply {
+            message = Component.literal("Auto Update: " + if (ModUpdates.autoUpdate) "On" else "Off")
+            active = ModUpdates.canToggle
+        }
+        downloadButton?.apply {
+            message = Component.literal(ModUpdates.downloadLabel)
+            active = ModUpdates.canDownload
+        }
+    }
+    *///? }
     override fun isPauseScreen()=false
     override fun extractRenderState(g: GuiGraphicsExtractor,mx: Int,my: Int,delta: Float) {
         g.fill(0,0,width,height,SettingsPalette.background or 0xFF000000.toInt())
@@ -73,12 +114,18 @@ internal class UpdateDetailsScreen(private val parent: Screen, private val highl
         val installed=font.split(Component.literal("Installed ${ModUpdates.installed}  ·  Minecraft ${ModUpdates.minecraftVersion}"),textWidth)
         installed.forEachIndexed { i,line -> g.text(font,line,x,56+i*11,SettingsPalette.muted,false) }
         var y=56+installed.size*11+15
-        val found=ModUpdates.release
-        val releaseTitle=found?.name?.ifBlank { found.tag } ?: "Release notes"
+        //? if updater {
+        /*val found = ModUpdates.release
+        val releaseTitle = found?.name?.ifBlank { found.tag } ?: "Release notes"
+        val notes = found?.notes ?: "Release status is unavailable. View GitHub releases to check manually."
+        *///? } else {
+        val releaseTitle = "Release notes"
+        val notes = "Use the release link below to find updates for this edition."
+        //? }
         val heading=font.split(Component.literal(releaseTitle).withStyle { it.withBold(true) },textWidth)
         heading.forEachIndexed { i,line -> g.text(font,line,x,y+i*11,SettingsPalette.gold,false) }
         y+=heading.size*11+10
-        val blocks = ReleaseNotes.parse(found?.notes ?: "Release status is unavailable. View GitHub releases to check manually.")
+        val blocks = ReleaseNotes.parse(notes)
         g.fill(x,y-3,right-14,y-2,SettingsPalette.border)
         notesTop=y+7
         if (wrappedBlocks != blocks || wrappedWidth != textWidth) {

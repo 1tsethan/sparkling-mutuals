@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import kotlin.math.ceil
 import kotlin.math.exp
@@ -36,3 +37,4 @@ internal object DoomspiralCabinet {
             seconds * 7f + 14f * (1f - exp(-seconds / 1.8f)) + index * 2
     }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
@@ -83,3 +84,4 @@ class CjsCrowdedApproachTest {
             }
     }
 }
+*///? }

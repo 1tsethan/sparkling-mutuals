@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.automation.GemzieAutoSelect
 import net.minecraft.client.Minecraft
@@ -23,3 +24,4 @@ abstract class GemzieUseMixin {
         if(GemzieAutoSelect.handle(client,false)) rightClickDelay=4 else startUseItem()
     }
 }
+*///? }

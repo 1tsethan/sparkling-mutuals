@@ -82,7 +82,11 @@ class SafariEspClickerTest {
     }
     @Test fun `ESP and auto clicker settings survive saving and existing configuration upgrades`() {
         ConfigManager.init(dir)
-        assertTrue(ConfigManager.autoClicker)
+//? if extended {
+/*        assertTrue(ConfigManager.autoClicker)
+*///? } else {
+        assertFalse(ConfigManager.autoClicker)
+//? }
         val settings = SafariSettings()
         settings.safari.autoClicker = false
         net.johnceo.sparklingmutuals.safari.completion.SafariFullClear.select(net.johnceo.sparklingmutuals.safari.SafariMode.FULL_CLEAR)

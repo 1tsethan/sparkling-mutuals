@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.misc.phantomleaf.PhantomleafSolver
 import net.minecraft.client.resources.sounds.SoundInstance
@@ -18,3 +19,4 @@ class PhantomleafSoundMixin {
         PhantomleafSolver.sound(sound.identifier.toString(), sound.pitch, sound.volume)
     }
 }
+*///? }

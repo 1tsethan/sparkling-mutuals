@@ -28,12 +28,14 @@ object CommandHelp {
         "/sm bests | sparklings | stats | profits" to "Open a history tab",
         "/newsession" to "Start a new profit session",
         "/sm history import" to "Import logs",
-        "/warping" to "Toggle auto warp",
+//? if extended {
+/*        "/warping" to "Toggle auto warp",
         "/start" to "Start the warping cycle",
         "/warpingdelay <seconds>" to "Warp delay",
         "/autoparty" to "Toggle Warp List invites",
         "/duo <IGN>" to "Select your Duo runner",
         "/leech" to "Toggle whitelisted invite acceptance",
+*///? }
         "/apikey <key>" to "Optional personal API key",
         "/sm debug" to "Save diagnostics"
     )

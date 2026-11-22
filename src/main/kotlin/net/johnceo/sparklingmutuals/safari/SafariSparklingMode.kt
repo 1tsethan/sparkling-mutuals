@@ -31,6 +31,12 @@ object SafariSparklingMode {
         warning = message
         client.player?.sendSystemMessage(LocalChat.component("[SM] $message"))
     }
+//? if extended {
+/*    private fun requirementMembers(client: Minecraft, actual: Set<String>): Set<String> =
+        net.johnceo.sparklingmutuals.alerts.SparkleWarping.requirementMembers(client, actual)
+*///? } else {
+    private fun requirementMembers(client: Minecraft, actual: Set<String>): Set<String> = actual
+//? }
     private fun invalidate() { generation++; task?.cancel(false); task = null; attemptedAt = 0; retry.reset() }
     fun tick(client: Minecraft) {
         if (client.player == null || client.connection == null) return
@@ -55,14 +61,16 @@ object SafariSparklingMode {
         // A confirmed empty roster is solo. Unknown membership cannot be treated as solo.
         val actualMembers = PartyManager.withLocal(client.player!!.uuid.toString())
         if (actualMembers == null) {
-            if (net.johnceo.sparklingmutuals.alerts.SparkleWarping.retainingRequirements(client)) {
+//? if extended {
+/*            if (net.johnceo.sparklingmutuals.alerts.SparkleWarping.retainingRequirements(client)) {
                 PartyManager.requestPartyInfo();return
             }
+*///? }
             if (roster.isNotEmpty()) { invalidate(); roster = emptySet(); state.reset() }
             PartyManager.requestPartyInfo()
             return
         }
-        val members = net.johnceo.sparklingmutuals.alerts.SparkleWarping.requirementMembers(client,actualMembers)
+        val members = requirementMembers(client,actualMembers)
         if (members != roster) { invalidate(); roster = members; warning = null }
         SafariLookup.selectParty(members, currentProvider)
         state.select(members, currentProvider)
@@ -86,7 +94,7 @@ object SafariSparklingMode {
                 task = null
                 if (client.connection !== connection || HypixelApi.provider != currentProvider) return@execute
                 if (client.player?.uuid?.toString()?.let(PartyManager::withLocal)?.let {
-                        net.johnceo.sparklingmutuals.alerts.SparkleWarping.requirementMembers(client,it)
+                        requirementMembers(client,it)
                     } != members) {
                     retry.failed(System.currentTimeMillis(), currentProvider)
                     return@execute
@@ -119,7 +127,7 @@ object SafariSparklingMode {
         }
         val before = SafariLookup.caught(members, species, participants)
         HypixelApi.recordSparkling(participants,species)
-        val requirements=net.johnceo.sparklingmutuals.alerts.SparkleWarping.requirementMembers(client,members)
+        val requirements=requirementMembers(client,members)
         state.select(requirements)
         val updated = requirements.mapNotNull { id -> SafariLookup.known(id)?.let { id to it } }.toMap()
         state.accept(requirements, updated)

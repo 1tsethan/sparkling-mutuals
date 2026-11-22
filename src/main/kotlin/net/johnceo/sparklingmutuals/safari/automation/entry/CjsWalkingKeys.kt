@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import net.minecraft.client.KeyMapping
 
@@ -26,3 +27,4 @@ class CjsWalkingKeys(private val forward: KeyMapping, private val sneak: KeyMapp
         }
     }
 }
+*///? }

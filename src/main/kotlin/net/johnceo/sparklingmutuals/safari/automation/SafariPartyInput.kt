@@ -41,7 +41,7 @@ object SafariPartyInput {
     private fun receive(text: String) {
         val client = Minecraft.getInstance()
         if (SafariDowntime.partyWarpMessage(text)) {
-            val inCanyon = client.level != null && !SafariManagerGuard.activeRun(client) &&
+            val inCanyon = client.level != null && !SafariEntryRunObservation.activeRun(client) &&
                 (net.johnceo.sparklingmutuals.safari.SafariIsland.currentMode.equals("foraging_3", true) ||
                     net.johnceo.sparklingmutuals.hud.SkyblockSidebar.areaName(client).equals("Torrhus Canyon", true))
             SafariDowntime.partyWarp(text, inCanyon, client.player?.uuid?.toString()?.let(PartyManager::isLeader) == true,
@@ -55,7 +55,7 @@ object SafariPartyInput {
                 resetPending()
                 ContestTracker.clearPartyContest()
             }
-            SafariDowntime.chat(text, SafariManagerGuard.activeRun(client), client.player?.name?.string.orEmpty())
+            SafariDowntime.chat(text, SafariEntryRunObservation.activeRun(client), client.player?.name?.string.orEmpty())
             return
         }
         val chat = PartyChat.parse(text) ?: return
@@ -66,8 +66,12 @@ object SafariPartyInput {
         val downtime = contest || ConfigManager.downtimeCommand &&
             (chat.body.matches(Regex("^!dt(?:\\s+.*)?$", RegexOption.IGNORE_CASE)) ||
                 SafariDowntime.readyMessage(chat.body) || SafariDowntime.ticketMessage(chat.body))
-        val kick = ConfigManager.holdManagerOnKick && SafariManagerGuard.inSafariInstance() &&
+//? if extended {
+/*        val kick = ConfigManager.holdManagerOnKick && SafariManagerGuard.inSafariInstance() &&
             chat.body.contains("kick", true)
+*///? } else {
+        val kick = false
+//? }
         if (!downtime && !kick) return
         displayNames[chat.sender.lowercase()] = chat.sender
         // Duplicate delivery on GAME/CHAT is idempotent while identity is pending.
@@ -131,12 +135,14 @@ object SafariPartyInput {
                     ContestTracker.confirmPartyTicket(id, item.receivedAt)
                 if (item.downtime && ConfigManager.downtimeCommand) queue.validated(id,
                     PartyChat.parse(item.text)?.body?.let { SafariDowntime.readyMessage(it) || SafariDowntime.ticketMessage(it) } == true, roster)
-                if (item.downtime && ConfigManager.downtimeCommand) SafariDowntime.chat(item.text, SafariManagerGuard.activeRun(client), self.name.string,
+                if (item.downtime && ConfigManager.downtimeCommand) SafariDowntime.chat(item.text, SafariEntryRunObservation.activeRun(client), self.name.string,
                     if (PartyManager.getMembers().any { PartyManager.isLeader(it) && SafariEntryPresence.normalize(it) == id })
                         roster.map { nameOf(it) ?: it } else emptyList())
                     ?.let(SafariDowntime::queueAnnouncement)
-                if (item.kickContext && item.world === client.level && SafariManagerGuard.inSafariInstance())
+//? if extended {
+/*                if (item.kickContext && item.world === client.level && SafariManagerGuard.inSafariInstance())
                     SafariManagerGuard.partyKick(PartyChat.parse(item.text)!!, item.receivedAt)
+*///? }
             } else if (item.sender !in resolving && System.currentTimeMillis() >= (retryAt[item.sender] ?: 0)) {
                 resolving.add(item.sender)
                 val generation = epoch

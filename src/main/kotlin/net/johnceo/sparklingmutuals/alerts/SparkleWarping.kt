@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.alerts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.alerts
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -267,3 +268,4 @@ object SparkleWarping {
         cleanup.clear();returning=emptyList();returningIds=emptySet();returningNamesById=emptyMap();returningPinned=false;nextCleanupAt=0;leech.clear()
     }
 }
+*///? }

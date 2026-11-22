@@ -48,7 +48,9 @@ class ContestGui(private val parent: Screen? = null) : Screen(Component.literal(
         val panels = mapOf(
             SafariHud.HOTSPOT to net.johnceo.sparklingmutuals.hud.HotspotHud.panel(true),
             SafariHud.ENTRY_COOLDOWN to net.johnceo.sparklingmutuals.safari.SafariEntryCooldown.preview(),
-            SafariHud.DEVELOPER to net.johnceo.sparklingmutuals.debug.SafariDeveloper.preview(),
+//? if extended {
+/*            SafariHud.DEVELOPER to net.johnceo.sparklingmutuals.debug.SafariDeveloper.preview(),
+*///? }
             SafariHud.DOOM_THROW to net.johnceo.sparklingmutuals.safari.DoomspiralThrowTimer.preview(),
             SafariHud.PROGRESS to SafariPanels.progress(run, ConfigManager.countUniqueOnly, 49000),
             SafariHud.SPLITS to SafariPanels.splitsPreview(),

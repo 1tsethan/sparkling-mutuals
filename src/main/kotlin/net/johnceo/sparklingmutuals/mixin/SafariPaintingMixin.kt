@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.SafariAssist
 import net.minecraft.client.renderer.culling.Frustum
@@ -22,3 +23,4 @@ class SafariPaintingMixin {
         if (entity is Painting && SafariAssist.hidePaintings()) result.returnValue = false
     }
 }
+*///? }

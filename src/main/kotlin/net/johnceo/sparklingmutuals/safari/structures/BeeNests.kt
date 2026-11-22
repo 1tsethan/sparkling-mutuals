@@ -101,7 +101,12 @@ object BeeNests {
                     SafariTracking.ledger.current, SafariSparklingMode.state)).mapNotNull { waypoint ->
                     val pos = positions.getValue(waypoint.position)
                     val loaded = level.isLoaded(pos)
-                    if (waypoint.nest && loaded && !level.getBlockState(pos).`is`(Blocks.BEE_NEST)) null
+//? if extended {
+/*                    if (waypoint.nest && loaded && !level.getBlockState(pos).`is`(Blocks.BEE_NEST)) null
+*///? } else {
+                    if (!waypoint.nest || !loaded || !level.getBlockState(pos).`is`(Blocks.BEE_NEST) ||
+                        !net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(pos, client)) null
+//? }
                     else Triple(pos, when {
                         !waypoint.nest -> "Survey site ${pos.x} ${pos.y} ${pos.z}"
                         !loaded -> "Nest (load area)"
@@ -110,11 +115,16 @@ object BeeNests {
                 }
             SafariAssist.biome == SafariBiome.CAVERN &&
                 SafariHelperRules.highlightSource("Snoozle", SafariFullClear.mode, SafariTracking.ledger.current, SafariSparklingMode.state) ->
-                SafariStructures.intactWalls.filter { level.isLoaded(it) && !level.getBlockState(it).isAir &&
+//? if extended {
+/*                SafariStructures.intactWalls.filter { level.isLoaded(it) && !level.getBlockState(it).isAir &&
+*///? } else {
+                SafariStructures.intactWalls.filter { net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility.block(it, client) && level.isLoaded(it) && !level.getBlockState(it).isAir &&
+//? }
                     it.distToCenterSqr(camera) < 40000 }.map { Triple(it, "Snoozle wall", SafariEspConfig.rgb(AppearanceConfig.snooperColor)) }
             else -> emptyList()
         }
-        val moundGroup = SafariEspConfig.groups.getValue("cavern")
+//? if extended {
+/*        val moundGroup = SafariEspConfig.groups.getValue("cavern")
         val alwaysShowMounds = SafariEspConfig.alwaysOn("Rockmite")
         val retainedMounds = if (moundGroup.enabled && SafariEspConfig.entityEnabled("Rockmite", mound = true) &&
             BiomeObjectiveConfig.allowsEsp("Rockmite", SafariFullClear.mode, run) &&
@@ -132,6 +142,9 @@ object BeeNests {
                 }
             }
         } else emptyList()
+*///? } else {
+        val retainedMounds = emptyList<Triple<BlockPos, String, Int>>()
+//? }
         val allMarkers = markers + retainedMounds
         lastRenderedMarkers = allMarkers.size
         for ((pos, _, color) in allMarkers) {
@@ -148,7 +161,8 @@ object BeeNests {
                 pos.x + .5, pos.y + 1.4, pos.z + .5, false)
         }
     }
-    /** Explain the block-data -> survey -> helper -> render boundaries without assuming a GPU failure. */
+//? if extended {
+/*    /** Explain the block-data -> survey -> helper -> render boundaries without assuming a GPU failure. */
     fun debug(client: Minecraft) {
         val level = client.level ?: return
         val run = SafariTracking.ledger.current
@@ -164,5 +178,6 @@ object BeeNests {
                 survey.classification(site), site in survey.remaining)
         }
     }
+*///? }
     fun reset() { survey.reset(); ticks = 0; renderCallbacks = 0; lastRenderedMarkers = 0 }
 }

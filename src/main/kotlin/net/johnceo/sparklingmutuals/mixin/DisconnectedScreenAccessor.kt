@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.minecraft.client.gui.screens.DisconnectedScreen
 import net.minecraft.client.gui.screens.Screen
@@ -11,3 +12,4 @@ interface DisconnectedScreenAccessor {
     @Accessor("parent") fun recoveryParent(): Screen
     @Accessor("details") fun recoveryDetails(): DisconnectionDetails
 }
+*///? }

@@ -60,10 +60,18 @@ Release mode also:
 1. Bumps `mod_version` before committing.
 2. Waits for the PR to merge, then verifies the merged tree exactly matches the tested branch and belongs to remote master.
 3. Creates a draft with your notes and tags that verified merged commit.
-4. Lets the tag-triggered Actions build, test, and verify Minecraft **26.1.2, 26.2, and 26.3**, then publish the verified JARs.
-5. Checks the published release identity, latest-release metadata, tag, notes, and title; downloads all three public JARs and verifies their sizes and SHA-256 hashes.
+4. Lets the tag-triggered Actions build, test, and verify Minecraft **26.1.2, 26.2, and 26.3**, then publish six Full and Full No Auto Update JARs and the verified manifest to GitHub.
+5. Checks the published release identity, latest-release metadata, tag, notes, and title; downloads the six GitHub JARs and manifest and verifies their sizes and SHA-256 hashes.
 
 Stable releases only: `X.Y.Z`. Same-version re-releases, beta releases, deleting old versions, README edits, and conflict resolution remain manual tasks. A new stable version with the expected assets is discoverable by the mod's existing updater. This script does not run a live Minecraft GUI test.
+
+### Enable Standard publication
+
+Confirm with Modrinth how the Standard listing should link to this repository, which also contains Full source. Submit an accurate description of Standard, its party sync network behavior, and any required disclosures. Start from the [draft support inquiry and listing](MODRINTH_DRAFT.md). Review the [Modrinth content rules](https://modrinth.com/legal/rules/#3-cheats-and-hacks) and complete in-game QA before the first listing.
+
+Configure the upstream Actions environment named `modrinth` with a scoped `MODRINTH_TOKEN` secret and `MODRINTH_PROJECT_ID` variable. Set the upstream repository variable `MODRINTH_APPROVED` to `true` after the listing/link guidance is confirmed. On the next release tag, Actions uploads each exact Minecraft target as a Standard version. The upload job validates the verified manifest and JAR contents, checks hashes again on the uploaded bytes, and resumes matching versions on a rerun.
+
+When Standard is live and the consolidated distribution is verified, add a migration notice to the legit fork and archive it. Direct players to the [edition guide](EDITIONS.md) for their configuration and update channel.
 
 ## When it stops
 

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.config
+//? if extended {
+/*package net.johnceo.sparklingmutuals.config
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -38,3 +39,4 @@ class GemzieConfigTest {
         assertFalse(ConfigManager.gemzieGemAutoSelect)
     }
 }
+*///? }

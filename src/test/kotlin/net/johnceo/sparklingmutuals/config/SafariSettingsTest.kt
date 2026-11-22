@@ -48,7 +48,11 @@ class SafariSettingsTest {
         ContestConfig.init(dir)
         assertFalse(ContestConfig.showContestTimer)
         assertTrue(ContestConfig.trackContest)
-        assertEquals("HUDs",SettingsCatalog(SafariSettings()).pages[7].name)
+//? if extended {
+/*        assertEquals("HUDs",SettingsCatalog(SafariSettings()).pages[7].name)
+*///? } else {
+        assertEquals("HUDs",SettingsCatalog(SafariSettings()).pages.first { it.name == "HUDs" }.name)
+//? }
         val next=SafariSettings();next.tracking.contestTimer=true;next.apply()
         ContestConfig.init(dir);assertTrue(ContestConfig.showContestTimer)
     }
@@ -66,11 +70,15 @@ class SafariSettingsTest {
         settings.safari.paintings = false
         settings.safari.shiny = false
         settings.party.enabled = false
-        settings.warp.enabled = true
+//? if extended {
+/*        settings.warp.enabled = true
         settings.warp.whitelist = "Leader, Friend; leader"
+*///? }
         settings.apply()
-        assertFalse(net.johnceo.sparklingmutuals.alerts.SparkleWarping.preparingParty,
+//? if extended {
+/*        assertFalse(net.johnceo.sparklingmutuals.alerts.SparkleWarping.preparingParty,
             "Enabling must not prepare or disband the party; /start does that")
+*///? }
         ConfigManager.init(dir)
         ContestConfig.init(dir)
         assertTrue(ContestConfig.firstClassTicket)
@@ -81,8 +89,13 @@ class SafariSettingsTest {
         assertFalse(ConfigManager.hideHauntedPaintings)
         assertFalse(ConfigManager.shinyDetection)
         assertFalse(ConfigManager.partyCommandsEnabled)
-        assertTrue(ConfigManager.warpAlertsEnabled)
+//? if extended {
+/*        assertTrue(ConfigManager.warpAlertsEnabled)
         assertEquals("Leader Friend",ConfigManager.leechWhitelist)
+*///? } else {
+        assertFalse(ConfigManager.warpAlertsEnabled)
+        assertFalse(ConfigManager.leechMode)
+//? }
         assertEquals(listOf(1), ContestConfig.warningMinutes())
         settings.miria.five = false
         settings.miria.ticketMode = 0
@@ -91,7 +104,8 @@ class SafariSettingsTest {
         ContestConfig.init(dir)
         assertFalse(ContestConfig.firstClassTicket)
         assertTrue(ContestConfig.warningMinutes().isEmpty())
-        val autoParty = ConfigManager.autoParty
+//? if extended {
+/*        val autoParty = ConfigManager.autoParty
         settings.warp.leech = true
         settings.apply()
         assertTrue(ConfigManager.leechMode)
@@ -113,6 +127,7 @@ class SafariSettingsTest {
         assertTrue(net.johnceo.sparklingmutuals.alerts.SparkleWarping.preparingParty,
             "/start must prepare the party even if warping is already enabled")
         net.johnceo.sparklingmutuals.alerts.SparkleWarping.cancelSetup()
+*///? }
     }
     @Test fun `bundled 0_9 area table identifies Haunted and rejects outside coordinates`() {
         assertEquals(4, SafariAreaMap.biomeAt(-4.0, 71.0, -79.0))

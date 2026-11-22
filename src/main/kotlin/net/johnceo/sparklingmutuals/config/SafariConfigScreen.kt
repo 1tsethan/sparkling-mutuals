@@ -17,9 +17,27 @@ import kotlin.math.round
 class SafariConfigScreen(private val settings: SafariSettings = SafariSettings(), private val initialTarget: SettingsTarget? = null, private val returnTo: Screen? = null) : Screen(net.minecraft.client.Minecraft.getInstance(),net.johnceo.sparklingmutuals.hud.HudFonts.font,Component.literal("Sparkling Mutuals")) {
     private val catalog=SettingsCatalog(settings)
     private data class Area(val name: String,val pages: List<Int>)
-    private val areas=listOf(Area("HUDs",listOf(0,7,10)),Area("Safari",listOf(1,6,3,12)),Area("Party",listOf(2,5)),
+//? if extended {
+/*    private val areas=listOf(Area("HUDs",listOf(0,7,10)),Area("Safari",listOf(1,6,3,12)),Area("Party",listOf(2,5)),
         Area("ESP",listOf(17,9,13,14,15,16)),Area("History",listOf(4)),Area("Advanced",listOf(8,11)))
     private val tabNames=mapOf(13 to "Mode critters",14 to "Profitable critters",15 to "Always on critters",16 to "Always on drops",17 to "General",0 to "Overview",7 to "HUDs",1 to "Modes",6 to "Helpers",3 to "Contest",2 to "Interactions",5 to "Sparkle Warping",9 to "Customization",10 to "Appearance",4 to "History",8 to "API",11 to "SkyBlock",12 to "Banner")
+*///? } else {
+    private fun page(name: String) = catalog.pages.indexOfFirst { it.name == name }
+    private val skyblockPage = page("SkyBlock")
+    private val customizationPage = page("ESP")
+    private fun area(name: String, vararg pages: String) = Area(name, pages.map(::page).filter { it >= 0 })
+    private val areas=listOf(
+        area("HUDs", "General", "HUDs", "Customization"),
+        area("Safari", "Modes", "Safari helpers", "Miria contest", "Banner"),
+        area("Party", "Party Interactions"),
+        area("ESP", "ESP General", "ESP", "Mode-wide Critter Toggles", "Profitable Critter Toggles", "Always On Toggle", "Floor Drop Always On Toggle"),
+        area("History", "History"), area("Advanced", "API key", "SkyBlock"))
+    private val tabNames=mapOf("Mode-wide Critter Toggles" to "Mode critters", "Profitable Critter Toggles" to "Profitable critters",
+        "Always On Toggle" to "Always on critters", "Floor Drop Always On Toggle" to "Always on drops", "ESP General" to "General",
+        "General" to "Overview", "HUDs" to "HUDs", "Modes" to "Modes", "Safari helpers" to "Helpers", "Miria contest" to "Contest",
+        "Party Interactions" to "Interactions", "ESP" to "Customization", "Customization" to "Appearance", "History" to "History",
+        "API key" to "API", "SkyBlock" to "SkyBlock", "Banner" to "Banner")
+//? }
     private val areaTabs=rememberedNavigation.areaTabs.toMutableMap().apply {
         areas.forEach {area -> get(area.name)?.let { if(it !in area.pages)remove(area.name) } }
     }
@@ -76,8 +94,13 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
             initialTarget?.let(catalog::locate)?.let { (page,chain) ->
                 initialQuery=""
                 selected=page;expanded.addAll(catalog.expansionFor(initialTarget!!))
-                if(page==11) skyblockTab=if(chain.first().field.name=="endgame") 1 else 0
+//? if extended {
+/*                if(page==11) skyblockTab=if(chain.first().field.name=="endgame") 1 else 0
                 if(page==9) customizationTab=when(chain.first().field.name) {"names"->0;"nameplates"->1;"biomeColors","critterColors"->2;else->3}
+*///? } else {
+                if(page==skyblockPage) skyblockTab=if(chain.first().field.name=="endgame") 1 else 0
+                if(page==customizationPage) customizationTab=when(chain.first().field.name) {"names"->0;"nameplates"->1;"biomeColors","critterColors"->2;else->3}
+//? }
                 focusPath=chain.last().path;scrollToFocus=true;highlightUntil=System.currentTimeMillis()+8000
             }
         }
@@ -86,9 +109,17 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
         search=EditBox(net.minecraft.client.Minecraft.getInstance().font,left+9,19,(header.searchWidth-18).coerceAtLeast(16),18,Component.literal("Search settings"))
         search.setBordered(false);search.setMaxLength(160);search.setHint(Component.empty())
         search.value=query;search.setResponder { scroll=0 };addRenderableWidget(search)
-        editor?.let { addRenderableWidget(it) };multilineEditor?.let { previous -> multilineEditor=createTextEditor(modal?.name.orEmpty(),previous.value);addRenderableWidget(multilineEditor!!) };ModUpdates.check()
+        editor?.let { addRenderableWidget(it) };multilineEditor?.let { previous -> multilineEditor=createTextEditor(modal?.name.orEmpty(),previous.value);addRenderableWidget(multilineEditor!!) }
+        //? if updater {
+        /*ModUpdates.check()
+        *///? }
     }
-    override fun tick() { settings.apply(notifyMode=true);ModUpdates.check() }
+    override fun tick() {
+        settings.apply(notifyMode = true)
+        //? if updater {
+        /*ModUpdates.check()
+        *///? }
+    }
     override fun removed() {
         rememberedNavigation = navigation()
         settings.apply(notifyMode=true)
@@ -175,7 +206,11 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
         if(search.value.isBlank()) {
             var tabX=left;var tabY=56
             activeArea.pages.forEach { page ->
-                val name=tabNames[page]?:catalog.pages[page].name
+//? if extended {
+/*                val name=tabNames[page]?:catalog.pages[page].name
+*///? } else {
+                val name=tabNames[catalog.pages[page].name]?:catalog.pages[page].name
+//? }
                 val w=(font.width(name)+24).coerceIn(66,(right-left).coerceAtLeast(66))
                 if(tabX>left && tabX+w>right) { tabX=left;tabY+=27 }
                 shell(g,Rect(tabX,tabY,w,22),if(selected==page) SettingsPalette.selected else SettingsPalette.card)
@@ -183,7 +218,11 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
                 hit(Rect(tabX,tabY,w,22)) { scrolls[selected]=scroll;selected=page;scroll=scrolls[page]?:0 }
                 tabX+=w+6
             }
-            if(selected==9) {
+//? if extended {
+/*            if(selected==9) {
+*///? } else {
+            if(selected==customizationPage) {
+//? }
                 tabX=left;tabY+=27
                 catalog.customizationTabs.forEachIndexed {index,label ->
                     val w=(font.width(label)+24).coerceAtMost((right-left).coerceAtLeast(1))
@@ -195,10 +234,18 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
                     tabX+=w+6
                 }
             }
-            if (selected==11) {
+//? if extended {
+/*            if (selected==11) {
+*///? } else {
+            if (selected==skyblockPage) {
+//? }
                 tabY+=29
                 var subX=left
-                listOf("Helpers","Endgame").forEachIndexed { index,label ->
+//? if extended {
+/*                listOf("Helpers","Endgame").forEachIndexed { index,label ->
+*///? } else {
+                listOf("Helpers").forEachIndexed { index,label ->
+//? }
                     val r=Rect(subX,tabY,font.width(label)+24,22)
                     shell(g,r,if(skyblockTab==index) SettingsPalette.selected else SettingsPalette.card)
                     text(g,label,r.x+12,r.y+7)
@@ -313,8 +360,13 @@ class SafariConfigScreen(private val settings: SafariSettings = SafariSettings()
             }
         }
         if(query.isBlank()) {
-            if (selected==11) visit(catalog.pages[selected].rows[skyblockTab].children,0)
+//? if extended {
+/*            if (selected==11) visit(catalog.pages[selected].rows[skyblockTab].children,0)
             else if(selected==9)visit(catalog.customizationRows(customizationTab),0)
+*///? } else {
+            if (selected==skyblockPage) visit(catalog.pages[selected].rows.getOrNull(skyblockTab.coerceAtMost(0))?.children.orEmpty(),0)
+            else if(selected==customizationPage)visit(catalog.customizationRows(customizationTab),0)
+//? }
             else visit(catalog.pages[selected].rows,0)
         } else catalog.pages.forEach { visit(it.rows,0) }
     }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.commands
+//? if extended {
+/*package net.johnceo.sparklingmutuals.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -63,3 +64,4 @@ object AlertCommand {
         }
     }
 }
+*///? }

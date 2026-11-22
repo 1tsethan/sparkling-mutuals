@@ -33,7 +33,8 @@ class ConfigTest {
         assertTrue(after.width(measure) < before.width(measure))
     }
 
-    @Test fun `warping timing upgrade resets once and sliders preserve later customization`() {
+//? if extended {
+/*    @Test fun `warping timing upgrade resets once and sliders preserve later customization`() {
         val file=dir.resolve("sparkling-mutuals.properties")
         Files.writeString(file,"warpDelaySeconds=23\nrepartyDelaySeconds=24\nshinyDetection=false\n")
         ConfigManager.init(dir);ContestConfig.init(dir)
@@ -54,6 +55,7 @@ class ConfigTest {
         assertEquals(26,ConfigManager.warpDelaySeconds)
         assertEquals(25,ConfigManager.validRepartyDelay(29,26))
     }
+*///? }
     @Test fun `redesigned shard guidance enables once then respects the saved toggle`() {
         val file=dir.resolve("sparkling-mutuals.properties")
         Files.writeString(file,"shardSaleGuidance=false\nwaterOpacity=37\ncustomLegacyValue=keep\n")
@@ -69,7 +71,8 @@ class ConfigTest {
         ConfigManager.init(dir)
         assertFalse(ConfigManager.shardSaleGuidance)
     }
-    @Test fun `config folder migration preserves saves and archives older duplicates`() {
+//? if extended {
+/*    @Test fun `config folder migration preserves saves and archives older duplicates`() {
         val settings = "sparkling-mutuals.properties"
         val runs = "sparkling-mutuals-runs.json"
         val backup = "$runs.pre-import.bak"
@@ -78,8 +81,10 @@ class ConfigTest {
         Files.writeString(dir.resolve(runs), "history")
         Files.writeString(dir.resolve(backup), "backup")
         Files.writeString(dir.resolve(cache), "old cache")
+*///? }
 
-        val target = ConfigStorage.migrate(dir)
+//? if extended {
+/*        val target = ConfigStorage.migrate(dir)
         assertEquals("waterOpacity=0.6", Files.readString(target.resolve(settings)))
         assertEquals("history", Files.readString(target.resolve(runs)))
         val archive = target.resolve("backups/legacy")
@@ -113,14 +118,24 @@ class ConfigTest {
         ConfigManager.init(dir)
         assertFalse(ConfigManager.leechMode)
     }
+*///? }
     @Test fun `curated defaults exclude account data and never replace existing configs`() {
         val defaults = FreshInstallDefaults.main()
         assertFalse(defaults.containsKey("apiKey"))
         assertFalse(defaults.stringPropertyNames().any { it.startsWith("pb.") || it.contains("uuid", true) })
-        assertFalse(defaults.getProperty("warpList.players").isBlank())
+//? if extended {
+/*        assertFalse(defaults.getProperty("warpList.players").isBlank())
         for(key in listOf("hotspotAnnouncer","warpAlertsEnabled","leechMode","announceStartingItems","ubiksCubeTimer"))
+*///? } else {
+        assertNull(defaults.getProperty("warpList.players"))
+        for(key in listOf("hotspotAnnouncer","announceStartingItems","ubiksCubeTimer"))
+//? }
             assertEquals("false",defaults.getProperty(key),key)
-        assertFalse(defaults.getProperty("leechWhitelist").isBlank())
+//? if extended {
+/*        assertFalse(defaults.getProperty("leechWhitelist").isBlank())
+*///? } else {
+        assertNull(defaults.getProperty("leechWhitelist"))
+//? }
         ConfigManager.init(dir); ContestConfig.init(dir)
         assertEquals(0, ConfigManager.safariTicketPreference)
         assertFalse(AppearanceConfig.panels.getValue("progress").borderEnabled)
@@ -135,8 +150,13 @@ class ConfigTest {
         assertFalse(ConfigManager.fullClearMode)
         assertFalse(ConfigManager.sparklingMode)
         assertFalse(ConfigManager.hotspotAnnouncer)
-        assertFalse(net.johnceo.sparklingmutuals.alerts.WarpList.names("Hideyho").isEmpty())
+//? if extended {
+/*        assertFalse(net.johnceo.sparklingmutuals.alerts.WarpList.names("Hideyho").isEmpty())
         assertEquals(defaults.getProperty("leechWhitelist"), ConfigManager.leechWhitelist)
+*///? } else {
+        assertTrue(net.johnceo.sparklingmutuals.alerts.WarpList.names("Hideyho").isEmpty())
+        assertFalse(ConfigManager.leechMode)
+//? }
         for((w,h) in listOf(320 to 240,640 to 360,1280 to 720)) for(hud in SafariHud.entries) {
             val box=hud.layout.bounds(w,h,180,100)
             assertTrue(box.x>=0 && box.y>=0 && box.x+box.width<=w && box.y+box.height<=h,hud.name)
@@ -159,11 +179,18 @@ class ConfigTest {
         assertEquals("true",upgraded.remove("migration.shardSaleGuidanceV2"))
         assertEquals("true",upgraded.remove("shardSaleGuidance"))
         assertEquals("true",upgraded.remove("migration.sparkleWarpTimers22_27"))
-        assertEquals("27",upgraded.remove("warpDelaySeconds"))
+//? if extended {
+/*        assertEquals("27",upgraded.remove("warpDelaySeconds"))
         assertEquals("22",upgraded.remove("repartyDelaySeconds"))
+*///? } else {
+        assertNull(upgraded.remove("warpDelaySeconds"))
+        assertNull(upgraded.remove("repartyDelaySeconds"))
+        original.remove("safariTicketPreference")
+//? }
         assertEquals(original,upgraded)
         assertEquals(legacyContest, Files.readString(dir.resolve("sparkling-mutuals-contest.properties")))
-    }
+//? if extended {
+/*    }
     @Test fun `single projection switch preserves old master choice and drops the obsolete gate on save`() {
         val file=dir.resolve("sparkling-mutuals.properties")
         for(master in listOf(false,true)) for(oldGate in listOf(false,true)) {
@@ -180,18 +207,21 @@ class ConfigTest {
             val saved=java.util.Properties().also { Files.newInputStream(file).use(it::load) }
             assertFalse(saved.containsKey("allowUncalibratedCapsuleEstimates"),"Obsolete second gate must not survive a settings save")
         }
+*///? }
     }
     @Test fun `through terrain display preference loads from saved settings`() {
         Files.writeString(dir.resolve("sparkling-mutuals.properties"),"showCapsuleGuideThroughTerrain=false\n")
         ConfigManager.init(dir)
         assertFalse(ConfigManager.showCapsuleGuideThroughTerrain)
-    }
+//? if extended {
+/*    }
     @Test fun `through terrain toggle saves through the settings screen and defaults on for old files`() {
         ConfigManager.init(dir);assertTrue(ConfigManager.showCapsuleGuideThroughTerrain)
         val settings=SafariSettings();settings.safari.showCapsuleGuideThroughTerrain=false;settings.apply()
         ConfigManager.init(dir);assertFalse(ConfigManager.showCapsuleGuideThroughTerrain)
         Files.writeString(dir.resolve("sparkling-mutuals.properties"),"showCapsuleGuideThroughTerrain=invalid\n")
         ConfigManager.init(dir);assertTrue(ConfigManager.showCapsuleGuideThroughTerrain)
+*///? }
     }
     @Test fun `projection width persists and remains finite for old and invalid files`() {
         ConfigManager.init(dir);assertEquals(3f,ConfigManager.capsulePathWidth)
@@ -201,7 +231,8 @@ class ConfigTest {
         ConfigManager.init(dir);assertEquals(3f,ConfigManager.capsulePathWidth)
     }
     @TempDir lateinit var dir: Path
-    @Test fun `capsule preview defaults on and saved opt out survives settings application and reload`() {
+//? if extended {
+/*    @Test fun `capsule preview defaults on and saved opt out survives settings application and reload`() {
         val old=ConfigManager.experimentalCapsulePath
         try {
             ConfigManager.init(dir)
@@ -218,6 +249,7 @@ class ConfigTest {
             assertFalse(SafariSettings().safari.experimentalCapsulePath)
         } finally { ConfigManager.experimentalCapsulePath=old }
     }
+*///? }
     @Test fun `HUD layouts and personal bests survive actual configuration saving`() {
         ConfigManager.init(dir)
         ConfigManager.personalBests.record("CAPTURE! You caught a Doomspiral!", SafariRun(1000), 62000)
@@ -273,7 +305,8 @@ class ConfigTest {
         assertTrue(ConfigManager.partyCommandsEnabled)
     }
 
-    @Test
+//? if extended {
+/*    @Test
     fun `warp settings survive a restart and invalid values fall back safely`() {
         ConfigManager.init(dir)
         ConfigManager.warpAlertsEnabled = true
@@ -300,6 +333,7 @@ class ConfigTest {
         assertFalse(ConfigManager.leechMode)
         assertEquals("JohnCEO _cj Rqach johnkuudra",ConfigManager.leechWhitelist)
     }
+*///? }
 
     @Test
     fun `warning presets parse spaces and none survives saving`() {

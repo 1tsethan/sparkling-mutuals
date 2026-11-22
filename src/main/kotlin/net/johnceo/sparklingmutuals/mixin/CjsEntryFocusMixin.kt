@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue
 import net.johnceo.sparklingmutuals.safari.automation.entry.CjsSafariEntry
@@ -13,3 +14,4 @@ class CjsEntryFocusMixin {
     private fun pauseOnFocusLoss(enabled: Boolean): Boolean =
         enabled && !CjsSafariEntry.allowsBackgroundEntry(Minecraft.getInstance())
 }
+*///? }

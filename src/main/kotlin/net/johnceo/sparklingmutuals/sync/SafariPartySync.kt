@@ -624,8 +624,10 @@ object SafariPartySync {
             else if (current.sparkling[word] and bit != 0 && (localSparkling[word] or localSparkling[word+2]) and bit == 0 &&
                 SafariTracking.ledger.current?.sparklingCaptures?.captured(species)!=true && notifiedSparks.add(species)) {
                 SafariDeveloper.event("Shared sparkling · $species")
-                SparklingEncounters.shared(species)
+//? if extended {
+/*                SparklingEncounters.shared(species)
                 net.johnceo.sparklingmutuals.alerts.SparkleAutoParty.detected(species)
+*///? }
             }
         }
     }

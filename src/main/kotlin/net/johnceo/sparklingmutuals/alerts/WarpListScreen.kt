@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.alerts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.alerts
 
 import com.mojang.blaze3d.platform.InputConstants
 import net.johnceo.sparklingmutuals.compat.*
@@ -262,3 +263,4 @@ class WarpListScreen(private val parent: Screen?, private val autoPartyChanged: 
     override fun onClose() { save();minecraft.smSetScreen(parent) }
     override fun isPauseScreen()=false
 }
+*///? }

@@ -79,7 +79,8 @@ class FloorColorsAndContestDowntimeTest {
         assertFalse(state.poll(2, 1, true, true, true, true))
         assertTrue(state.poll(3, 0, true, true, true, true))
     }
-    @Test fun `contest downtime switch defaults on and saved off remains off`() {
+//? if extended {
+/*    @Test fun `contest downtime switch defaults on and saved off remains off`() {
         ContestConfig.init(dir)
         assertTrue(ContestConfig.autoContestDowntime)
         ContestConfig.autoContestDowntime = false
@@ -89,4 +90,14 @@ class FloorColorsAndContestDowntimeTest {
         assertFalse(ContestConfig.autoContestDowntime)
         assertFalse(SafariSettings.Miria().autoContestDowntime)
     }
+*///? } else {
+    @Test fun `Standard ignores persisted contest entry automation`() {
+        java.nio.file.Files.writeString(dir.resolve("sparkling-mutuals-contest.properties"), "autoContestDowntime=true")
+        ContestConfig.init(dir)
+        assertFalse(ContestConfig.autoContestDowntime)
+        ContestConfig.save()
+        assertFalse(java.nio.file.Files.readString(dir.resolve("sparkling-mutuals-contest.properties")).contains("autoContestDowntime"))
+    }
+//? }
+
 }

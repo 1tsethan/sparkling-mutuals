@@ -1,15 +1,22 @@
 package net.johnceo.sparklingmutuals.config
 
-import java.nio.file.FileAlreadyExistsException
+//? if extended {
+/*import java.nio.file.FileAlreadyExistsException
+*///? }
 import java.nio.file.Files
 import java.nio.file.Path
 import net.fabricmc.loader.api.FabricLoader
 
-/** Migrate before opening any store so a partial move never falls through to fresh defaults. */
+/** Resolves the configuration directory before the edition opens its stores. */
 internal object ConfigStorage {
-    private const val folder = "sparkling-mutuals"
+//? if extended {
+/*    private const val folder = "sparkling-mutuals"
+*///? } else {
+    private const val folder = "sparkling-mutuals-legit"
+//? }
     val directory: Path get() = FabricLoader.getInstance().configDir.resolve(folder)
-
+//? if extended {
+/*
     private val active = setOf(
         "sparkling-mutuals.properties", "sparkling-mutuals-contest.properties",
         "sparkling-mutuals-pbs.properties", "sparkling-mutuals-honeyhives.properties",
@@ -56,4 +63,7 @@ internal object ConfigStorage {
             }
         }
     }
+*///? } else {
+    fun migrate(root: Path): Path = Files.createDirectories(root.resolve(folder))
+//? }
 }

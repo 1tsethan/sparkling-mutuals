@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin;
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin;
 
 import net.johnceo.sparklingmutuals.safari.esp.CritterGlowState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -11,3 +12,4 @@ public class CritterGlowStateMixin implements CritterGlowState {
     public boolean sm$isCritterGlow() { return sm$critterGlow; }
     public void sm$setCritterGlow(boolean value) { sm$critterGlow = value; }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import java.util.UUID
 import net.azureaaron.hmapi.events.HypixelPacketEvents
@@ -201,3 +202,4 @@ object CjsSafariEntry {
         nextRosterAt=0;trace.clear()
     }
 }
+*///? }

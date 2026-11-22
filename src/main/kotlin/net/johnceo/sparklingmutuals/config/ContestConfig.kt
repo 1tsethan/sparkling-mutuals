@@ -27,7 +27,13 @@ object ContestConfig {
     var showBracket = true
     var showScore = true
     var trackContest = true
-    var autoContestDowntime = true
+//? if extended {
+/*    var autoContestDowntime = true
+*///? } else {
+    var autoContestDowntime: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+//? }
     var announceTicket = true
     var basicTicketMessage = "Ticket earned!"
     var firstClassTicketMessage = "First-Class Ticket earned!"
@@ -73,7 +79,9 @@ object ContestConfig {
             showBracket = getProperty("showBracket","true").toBooleanStrictOrNull() ?: true
             showScore = getProperty("showScore","true").toBooleanStrictOrNull() ?: true
             trackContest = getProperty("trackContest", "true").toBoolean()
-            autoContestDowntime = getProperty("autoContestDowntime", "true").toBooleanStrictOrNull() ?: true
+//? if extended {
+/*            autoContestDowntime = getProperty("autoContestDowntime", "true").toBooleanStrictOrNull() ?: true
+*///? }
             ticketAnnouncements.clear()
             stringPropertyNames().filter { it.startsWith("ticketAnnounced.") }.forEach { key ->
                 getProperty(key).toLongOrNull()?.let { ticketAnnouncements[key.removePrefix("ticketAnnounced.")] = it }
@@ -115,7 +123,9 @@ object ContestConfig {
             setProperty("showBracket",showBracket.toString())
             setProperty("showScore",showScore.toString())
             setProperty("trackContest", trackContest.toString())
-            setProperty("autoContestDowntime", autoContestDowntime.toString())
+//? if extended {
+/*            setProperty("autoContestDowntime", autoContestDowntime.toString())
+*///? }
             setProperty("ticketMode", ticketMode.toString())
             setProperty("announceTicket",announceTicket.toString())
             setProperty("basicTicketMessage",validTicketMessage(basicTicketMessage,false))

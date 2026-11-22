@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.shots.preview.contacts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.shots.preview.contacts
 
 import net.johnceo.sparklingmutuals.safari.SafariAssist
 import net.johnceo.sparklingmutuals.safari.esp.*
@@ -259,3 +260,4 @@ object CapsuleContactScene {
         return ContactSegmentScene(best,boundary)
     }
 }
+*///? }

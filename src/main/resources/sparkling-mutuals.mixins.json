@@ -1,13 +1,28 @@
 {
-	"required": true,
-	"package": "net.johnceo.sparklingmutuals.mixin",
-	"compatibilityLevel": "JAVA_25",
-	"mixins": [],
-    "client": ["DisconnectedScreenAccessor", "HypixelDisconnectMixin", "ChatCritterNamesMixin", "HuntingBoxNamesMixin", "CritterTextDisplayMixin", "CritterGlowStateMixin", "CritterArmorStandMixin", "HudFontAccessor", "GuiGraphicsExtractorAccessor", "DoomspiralServerTickMixin", "DoomspiralLotteryHudMixin", "SafariWaterFogMixin", "SafariWaterSurfaceMixin", "SafariWaterOverlayMixin", "SafariSodiumWaterMixin", "SafariPaintingMixin", "SafariShinyMixin", "SafariAttackKeyAccessor", "DisplayStateAccessor", "SafariAutoClickerMixin", "SafariChatMixin", "SafariCapsuleMixin", "SafariCandleMixin", "SafariManagerMixin", "CjsEntryFocusMixin", "CjsEntryKeyboardMixin", "CjsEntryMouseMixin", "SafariTicketScreenMixin", "SparklingHoverMixin", "PartyNameSuggestionsMixin", "SafariParticleMixin", "PhantomleafSoundMixin", "CapsuleContactPacketMixin", "CapsuleShaderRenderMixin", "GemzieUseMixin", "ShardSaleContainerMixin", "ShardSaleScreenBounds"],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "package": "net.johnceo.sparklingmutuals.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [],
+  "client": [
+    "ChatCritterNamesMixin",
+    "HuntingBoxNamesMixin",
+    "CritterTextDisplayMixin",
+    "HudFontAccessor",
+    "GuiGraphicsExtractorAccessor",
+    "DoomspiralServerTickMixin",
+    "DisplayStateAccessor",
+    "SafariChatMixin",
+    "SafariCapsuleMixin",
+    "SparklingHoverMixin",
+    "PartyNameSuggestionsMixin",
+    "SafariParticleMixin",
+    "ShardSaleContainerMixin",
+    "ShardSaleScreenBounds"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

@@ -18,6 +18,11 @@ class CommandSpacing<T> {
 }
 
 object AutomatedCommands {
+//? if standard {
+    internal fun allowed(command: String): Boolean = command.none { it == '\n' || it == '\r' } &&
+        (command == "p list" || command == "profileid" || command.startsWith("pc "))
+
+//? }
     private data class Pending(val connection: ClientPacketListener,val command: String,val expires: Long,val run: Any?)
     private val queue=CommandSpacing<Pending>()
     fun send(connection: ClientPacketListener,command: String) {
@@ -28,7 +33,8 @@ object AutomatedCommands {
         if(client.connection==null) { reset();return }
         val now=System.nanoTime()/1_000_000
         val pending=queue.next(now) ?: return
-        val allowed=when {
+//? if extended {
+/*        val allowed=when {
             pending.command=="p warp" || pending.command=="p disband" || pending.command.startsWith("p kick ") ->
                 net.johnceo.sparklingmutuals.config.ConfigManager.warpAlertsEnabled && !net.johnceo.sparklingmutuals.config.ConfigManager.leechMode
             pending.command.startsWith("p accept ") || pending.command=="p leave" -> net.johnceo.sparklingmutuals.config.ConfigManager.leechMode
@@ -36,6 +42,10 @@ object AutomatedCommands {
                 net.johnceo.sparklingmutuals.config.ConfigManager.warpAlertsEnabled && !net.johnceo.sparklingmutuals.config.ConfigManager.leechMode
             else -> true
         }
+*///? } else {
+        // Only informational queries and party chat survive in the legit edition.
+        val allowed = allowed(pending.command)
+//? }
         if(allowed && client.connection===pending.connection && now<=pending.expires && SafariTracking.ledger.current===pending.run)
             pending.connection.sendCommand(pending.command)
     }

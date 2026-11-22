@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.esp
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.esp
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -37,3 +38,4 @@ object DuplicoGlow {
         vertex(x0,y0,z1);vertex(x1,y0,z1);vertex(x1,y1,z1);vertex(x0,y1,z1)
     }
 }
+*///? }

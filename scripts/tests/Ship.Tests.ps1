@@ -87,8 +87,13 @@ function global:gh {
             $inputIndex = [array]::IndexOf($a,'--input') + 1
             $r = Get-Content -LiteralPath $a[$inputIndex] -Raw | ConvertFrom-Json
             $s.ReleaseTag = $r.tag_name
-            $assets = @('26.1.2','26.2','26.3' | ForEach-Object {
-                $name="sparkling-mutuals-$($r.tag_name.Substring(1))+mc$_.jar"
+            $assetNames = @('build-manifest.json')
+            foreach ($target in '26.1.2','26.2','26.3') {
+                $assetNames += "sparkling-mutuals-$($r.tag_name.Substring(1))+mc$target.jar"
+                $assetNames += "sparkling-mutuals-full-noautoupdate-$($r.tag_name.Substring(1))+mc$target.jar"
+            }
+            $assets = @($assetNames | ForEach-Object {
+                $name = $_
                 @{id=$_;name=$name;size=3;digest='sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
                     browser_download_url="https://github.com/johnceoskyblock/sparkling-mutuals/releases/download/$($r.tag_name)/$name"}
             })
@@ -196,7 +201,7 @@ try {
         Expect-Failure { & $ship -RepositoryPath $work -Message 'Release' -Version 4.3.10 -NotesFile $notes } 'Tag v4.3.10 already exists'
         Assert ((Invoke-ShipNative git @('-C',$work,'rev-parse','HEAD')) -eq $global:ShipMock.Initial) 'Committed despite existing tag'
     }
-    Test 'Release tags the verified merged commit and checks all three public JAR digests' {
+    Test 'Release tags the verified commit and checks six public JARs and the manifest' {
         $work = New-Fixture
         $notes = Join-Path $fixtures 'notes.txt'
         [IO.File]::WriteAllText($notes,"Feature one`nFeature two")
@@ -209,7 +214,7 @@ try {
         $work = New-Fixture
         $global:ShipMock.BadAssets = $true
         $notes = Join-Path $fixtures 'notes.txt'
-        Expect-Failure { & $ship -RepositoryPath $work -Message 'Bad release' -Version 4.3.10 -NotesFile $notes } 'exactly the three expected'
+        Expect-Failure { & $ship -RepositoryPath $work -Message 'Bad release' -Version 4.3.10 -NotesFile $notes } 'exactly the six expected'
     }
     Write-Host "$passed shipping script tests passed. No real GitHub or HTTP requests were made."
 } finally {

@@ -1,6 +1,7 @@
 package net.johnceo.sparklingmutuals.alerts
 
-import java.util.concurrent.Executors
+//? if extended {
+/*import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -14,8 +15,10 @@ import net.johnceo.sparklingmutuals.safari.SafariTracking
 import net.johnceo.sparklingmutuals.party.PartyManager
 import net.minecraft.client.Minecraft
 
+*///? }
 object AlertManager {
-
+//? if extended {
+/*
     private val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor {
         Thread(it, "Sparkling Mutuals warp reminder").apply { isDaemon = true }
     }
@@ -99,4 +102,7 @@ object AlertManager {
     fun isEnabled(): Boolean = ConfigManager.warpAlertsEnabled
 
     fun getDelay(): Int = ConfigManager.warpDelaySeconds
+*///? } else {
+    fun getDelay() = 27
+//? }
 }

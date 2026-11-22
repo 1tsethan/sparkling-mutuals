@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -36,3 +37,4 @@ class CjsPhysicalInputTest {
         //? }
     }
 }
+*///? }

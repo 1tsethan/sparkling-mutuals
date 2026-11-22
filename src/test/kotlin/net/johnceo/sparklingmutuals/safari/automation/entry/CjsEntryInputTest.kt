@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import java.util.UUID
 import net.johnceo.sparklingmutuals.safari.SafariTicketType
@@ -47,3 +48,4 @@ class CjsEntryInputTest {
         assertEquals(listOf("manager $target"),packets)
     }
 }
+*///? }

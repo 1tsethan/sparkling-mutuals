@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
@@ -158,3 +159,4 @@ object SafariTicketSelect {
     }
     private fun reset() { world = null; connection = null; menu = null; clicked = false; revealed = false; shownAt = 0; lastAttempt = 0 }
 }
+*///? }

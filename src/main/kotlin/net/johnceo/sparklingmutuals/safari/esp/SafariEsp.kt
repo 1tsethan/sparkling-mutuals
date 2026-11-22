@@ -9,6 +9,9 @@ import net.minecraft.world.entity.EntityType
 import net.johnceo.sparklingmutuals.compat.*
 import com.mojang.authlib.GameProfile
 import java.util.UUID
+//? if standard {
+import net.johnceo.sparklingmutuals.safari.visibility.LocalVisibility
+//? }
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
@@ -444,7 +447,11 @@ object SafariEsp {
     }
     private fun trackedModel(target: Target) = SafariEspRules.requiresModelLabel(target.species, target.entity.type.toShortString())
     /** Rendering may retain visual proof; remaining-capture observations always use strict live(). */
-    private fun drawable(target: Target, client: Minecraft) = live(target, client, forEsp = true)
+//? if extended {
+/*    private fun drawable(target: Target, client: Minecraft) = live(target, client, forEsp = true)
+*///? } else {
+    private fun drawable(target: Target, client: Minecraft) = live(target, client, forEsp = true) && LocalVisibility.entity(target.entity, client)
+//? }
     private fun pruneDrawableTargets(client: Minecraft) {
         // Keep list identity when every target survives so outline lookup can reuse its index.
         var remaining: MutableList<Target>? = null
@@ -500,7 +507,8 @@ object SafariEsp {
             else !ConfigManager.fullClearMode && ConfigManager.profitableShardEsp)
             else labeled
     }
-    internal fun developerSnapshot(client: Minecraft): Map<String, Any?> {
+//? if extended {
+/*    internal fun developerSnapshot(client: Minecraft): Map<String, Any?> {
         val entities = client.level?.entitiesForRendering()?.filterNot { it.isRemoved }?.toList().orEmpty()
         val incenseIds = predictedIncenseIds
         val playerBiome = SafariAssist.biome
@@ -611,6 +619,7 @@ object SafariEsp {
                 entities.filter { it.customName != null && it.distanceToSqr(entity) <= 9 }.map { "${it.id}:${it.customName?.string}:${it.isCustomNameVisible}" })
         }
     }
+*///? }
     /** Loaded server entities only; observations do not depend on ESP switches or biome filtering. */
     internal fun renderedMoundSites(client: Minecraft): Set<Triple<Int, Int, Int>> {
         if (level !== client.level || client.player == null) return emptySet()
@@ -667,13 +676,21 @@ object SafariEsp {
     private fun floorEspEligible(drop: net.johnceo.sparklingmutuals.safari.resources.PredictedFloorDrop,
         client: Minecraft, biome: SafariBiome?, incenseIds: Set<Int>): Boolean =
         !ConfigManager.hideFloorDropEsp() && drop.actual == null &&
-            (0..2).all { client.level?.getEntity(drop.id + it)?.isRemoved == false } &&
+//? if extended {
+/*            (0..2).all { client.level?.getEntity(drop.id + it)?.isRemoved == false } &&
+*///? } else {
+            (0..2).any { client.level?.getEntity(drop.id + it)?.let { entity -> LocalVisibility.entity(entity, client) } == true } &&
+            LocalVisibility.position(net.minecraft.world.phys.Vec3(drop.x,drop.y,drop.z),client) &&
+//? }
             SafariEspRules.visible(true, SafariFloorDrops.selected(drop, incenseIds), SafariEspConfig.dropOnlyInBiome(drop.type), biome, drop.biome)
 
     private fun critterEspDecision(target: Target, client: Minecraft, playerBiome: SafariBiome?, now: Long): String {
         if (!SafariAssist.inSafari || client.options.smHideGui) return "HUD hidden or outside Safari"
         if (ConfigManager.hideCritterEsp()) return "Critter ESP hidden by mode"
         val entity = target.entity
+//? if standard {
+        if (!LocalVisibility.entity(entity, client)) return "Target not currently visible"
+//? }
         val mob = SafariRoster.named(target.species) ?: return "Unknown species"
         val group = SafariEspConfig.groups.getValue(mob.biome.name.lowercase())
         val actualBiome = SafariEspRules.biomeAt(entity.x, entity.z)
@@ -802,7 +819,8 @@ object SafariEsp {
             val mob = SafariRoster.named(target.species)!!
             if (critterEspDecision(target, client, playerBiome, now) == "Eligible") {
                 val box = bounds(target, delta)
-                val height = when (mob.name) {
+//? if extended {
+/*                val height = when (mob.name) {
                     "Litterbug" -> litterbugs.hiddenHeight(e.uuid, e.x, e.y, e.z)
                     "Shyworm" -> shyworms.hiddenHeight(e.uuid, e.y)
                     else -> null
@@ -812,6 +830,10 @@ object SafariEsp {
                     mob.name == "Shyworm" -> ShywormProjection.projectHead(box, e.getPosition(delta), height)
                     else -> box.move(0.0, height - e.getPosition(delta).y, 0.0)
                 }
+*///? } else {
+                val height: Double? = null
+                val projected = box
+//? }
                 val food = if (mob.name == "Scrappy" && e is Armadillo && e.isScared) scrappyFoods.food(e.uuid) else null
                 val color = targetColor(target)
                 val mound = mob.name == "Rockmite" && e is Display.ItemDisplay
@@ -839,7 +861,11 @@ object SafariEsp {
                     }
                 }
                 val retainedWormHead = mob.name == "Shyworm" && height != null
-                if (SafariEspConfig.showCritterBox(mob.name) || mound ||
+//? if extended {
+/*                if (SafariEspConfig.showCritterBox(mob.name) || mound ||
+*///? } else {
+                if (SafariEspConfig.showCritterBox(mob.name) || SafariEspConfig.critterGlow || mound ||
+//? }
                     retainedWormHead && ShywormProjection.showRetainedHead(SafariEspConfig.critterBoxes, SafariEspConfig.critterGlow))
                     frame(projected, if (retainedWormHead && SafariAssist.isHighlighted(e.id))
                         SafariEspConfig.rgb(AppearanceConfig.sparklingColor) else color)
@@ -854,7 +880,8 @@ object SafariEsp {
                 }
             }
         }
-        val litterbugMob=SafariRoster.named("Litterbug")!!
+//? if extended {
+/*        val litterbugMob=SafariRoster.named("Litterbug")!!
         val litterbugGroup=SafariEspConfig.groups.getValue("haunted")
         val retainedBugNeeded=if(ConfigManager.sparklingMode)
             SafariEspRules.neededForSparkling("Litterbug",false,SafariSparklingMode.state,ConfigManager.sparklingProfitableShardEsp,SafariTracking.ledger.current)
@@ -868,8 +895,10 @@ object SafariEsp {
                 if(SafariEspConfig.critterBoxes) frame(box,SafariEspConfig.rgb(SafariEspConfig.entityColor("Litterbug",false)))
                 timers.add(Triple(location.marker.text,location.marker.color,box))
             }
+*///? }
         }
-        val wormMob = SafariRoster.named("Shyworm")!!
+//? if extended {
+/*        val wormMob = SafariRoster.named("Shyworm")!!
         val wormGroup = SafariEspConfig.groups.getValue(wormMob.biome.name.lowercase())
         val retainedWormNeeded = if (ConfigManager.sparklingMode)
             SafariEspRules.neededForSparkling("Shyworm", false, SafariSparklingMode.state,
@@ -887,10 +916,19 @@ object SafariEsp {
                 if (ShywormProjection.showRetainedHead(SafariEspConfig.critterBoxes, SafariEspConfig.critterGlow)) frame(box, color)
                 timers.add(Triple("Shyworm (last seen)", color, box))
             }
+*///? } else {
+        val selectedDrops = predictedDrops.filter {
+            floorEspEligible(it, client, playerBiome, predictedIncenseIds)
+//? }
         }
-        }
+//? if extended {
+/*        }
         val selectedDrops = predictedDrops.filter { floorEspEligible(it, client, playerBiome, predictedIncenseIds) }
         val tiles = selectedDrops.map { it.marker() to SafariEspConfig.rgb(SafariEspConfig.dropColor(it.type!!)) }
+*///? } else {
+        val generic = net.johnceo.sparklingmutuals.safari.resources.FloorDropType.GENERIC
+        val tiles = selectedDrops.map { it.marker() to SafariEspConfig.rgb(SafariEspConfig.dropColor(generic)) }
+//? }
         tiles.forEach { (tile, color) -> frame(AABB(tile.x.toDouble(), tile.y + 1.0, tile.z.toDouble(), tile.x + 1.0, tile.y + 1.0, tile.z + 1.0), color) }
         WorldRenderCompat.flush(context, lines)
         for ((tile, color) in tiles) {
@@ -902,9 +940,14 @@ object SafariEsp {
             WorldRenderCompat.label(context, text, color, box.center.x, box.maxY + .2, box.center.z, SafariEspConfig.labelWorldScale)
         }
         selectedDrops.forEach { drop ->
-            val type = drop.type!!
+//? if extended {
+/*            val type = drop.type!!
             WorldRenderCompat.label(context, type.label, SafariEspConfig.rgb(SafariEspConfig.dropColor(type)),
                 drop.x, drop.y + 1.2, drop.z, SafariEspConfig.dropLabelWorldScale(type))
+*///? } else {
+            WorldRenderCompat.label(context, "Floor drop", SafariEspConfig.rgb(SafariEspConfig.dropColor(generic)),
+                drop.x, drop.y + 1.2, drop.z, SafariEspConfig.dropLabelWorldScale(generic))
+//? }
         }
     }
     fun reset() { resetDrops(); targets = emptyList(); level = null; ticks = 0; stringDisplays = emptyList(); scanned = false; clearCaptured() }

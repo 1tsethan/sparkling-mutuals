@@ -1,6 +1,7 @@
 package net.johnceo.sparklingmutuals.alerts
 
-import net.azureaaron.hmapi.events.HypixelPacketEvents
+//? if extended {
+/*import net.azureaaron.hmapi.events.HypixelPacketEvents
 import net.azureaaron.hmapi.network.packet.v1.s2c.LocationUpdateS2CPacket
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.johnceo.sparklingmutuals.JoinWelcomeState
@@ -16,13 +17,17 @@ import net.minecraft.client.gui.screens.multiplayer.ServerReconfigScreen
 import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.client.multiplayer.ServerData
 import net.minecraft.client.multiplayer.resolver.ServerAddress
+*///? }
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.contents.TranslatableContents
-import org.slf4j.LoggerFactory
+//? if extended {
+/*import org.slf4j.LoggerFactory
+*///? }
 
-/** Recovers the connection separately from transfers within Hypixel. All state belongs to the client thread. */
+/** Classifies disconnects separately from transfers within Hypixel. */
 internal object HypixelRecovery {
-    private val logger = LoggerFactory.getLogger("sparkling-mutuals/recovery")
+//? if extended {
+/*    private val logger = LoggerFactory.getLogger("sparkling-mutuals/recovery")
     private val reconnect = HypixelReconnect<ServerData>()
 
     private var connection: ClientPacketListener? = null
@@ -155,6 +160,7 @@ internal object HypixelRecovery {
 
     private fun now() = System.nanoTime() / 1_000_000
 
+*///? }
     internal fun reconnectDelay(attempts: Int): Long = (5_000L shl attempts.coerceIn(0, 4)).coerceAtMost(60_000)
 
     private val nonRetryableKeys = setOf("disconnect.quitting", "disconnect.transfer", "disconnect.loginFailedInfo.invalidSession",
@@ -173,6 +179,9 @@ internal object HypixelRecovery {
             "resource pack was declined", "failed to verify username").none { it in text }
     }
 }
+//? if standard {
+
+//? }
 
 /** Owns retries for a specific disconnect and the screens created by those retries. */
 internal class HypixelReconnect<T : Any> {

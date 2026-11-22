@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.misc.phantomleaf
+//? if extended {
+/*package net.johnceo.sparklingmutuals.misc.phantomleaf
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -51,3 +52,4 @@ class PhantomleafSoundHookTest {
             "The actual Minecraft hook target must occur after sound resolution")
     }
 }
+*///? }

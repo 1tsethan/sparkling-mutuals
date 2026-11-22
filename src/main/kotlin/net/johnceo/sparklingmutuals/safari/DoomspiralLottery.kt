@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.johnceo.sparklingmutuals.compat.smHideGui
@@ -161,3 +162,4 @@ object DoomspiralLottery {
         return true
     }
 }
+*///? }

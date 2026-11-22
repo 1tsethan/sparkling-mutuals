@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.esp
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.esp
 
 import com.google.gson.Gson
 import net.johnceo.sparklingmutuals.compat.*
@@ -87,3 +88,4 @@ object ShywormBodyDiagnostics {
         return rows
     }
 }
+*///? }

@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.johnceo.sparklingmutuals.LocalChat
 import net.johnceo.sparklingmutuals.compat.smScreen
@@ -82,3 +83,4 @@ object GemzieAutoSelect {
         return GemzieStack(id,stack.hoverName.string,stack.count)
     }
 }
+*///? }

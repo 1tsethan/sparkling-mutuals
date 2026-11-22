@@ -71,8 +71,10 @@ class SafariModeAndInteractionIntegrationTest {
         settings.safari.candleHitbox = false
         settings.apply(); ConfigManager.init(dir)
         assertFalse(ConfigManager.candleHitbox)
-        assertTrue(SafariSettings.Warp::class.java.fields.mapNotNull {
+//? if extended {
+/*        assertTrue(SafariSettings.Warp::class.java.fields.mapNotNull {
             it.getAnnotation(net.johnceo.sparklingmutuals.config.ConfigOption::class.java)?.desc
         }.any { it.contains("warp list",true) && it.contains("priority order") })
+*///? }
     }
 }

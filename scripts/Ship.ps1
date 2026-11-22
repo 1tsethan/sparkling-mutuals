@@ -56,7 +56,7 @@ try {
     Write-Host "Repository: $repository"
     Invoke-ShipNative git @('status','--short') | Out-Host
     Write-Host 'Plan: commit ALL tracked/untracked local changes, rebase on the remote branch and master, push, create/update PR, wait for CI, merge.'
-    if ($Version) { Write-Host "Then publish v$Version with three verified Minecraft JARs and your notes." }
+    if ($Version) { Write-Host "Then tag v$Version and verify the published GitHub JARs and release manifest." }
     else { Write-Host 'No release or tag will be created.' }
     if (!$PSCmdlet.ShouldProcess($repository, $(if ($Version) { "Ship and release v$Version" } else { 'Ship and merge local changes' }))) { return }
 
@@ -149,7 +149,7 @@ try {
             Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $destination -MaximumRetryCount 3 -RetryIntervalSec 2
             if ((Get-Item -LiteralPath $destination).Length -ne $asset.size -or
                 'sha256:' + (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -ne $asset.digest) {
-                throw "Public JAR failed digest verification: $($asset.name)"
+                throw "Public asset failed digest verification: $($asset.name)"
             }
         }
         if ($release.body -ne $notes -or $release.name -ne $title) {
@@ -164,7 +164,7 @@ try {
         $remoteTag = Invoke-ShipNative git @('ls-remote','--tags','origin',"refs/tags/$tag")
         if (($remoteTag -split '\s+')[0] -ne $merged) { throw 'The release tag moved during publication.' }
         Write-Host "Release: $($release.html_url)"
-        Write-Host 'All three public JAR sizes and SHA-256 hashes verified.'
+        Write-Host 'All six public JARs and the manifest passed size and SHA-256 verification.'
     }
     Assert-ShipUnchanged $tested
     # Update local master only if it can be fast-forwarded without losing local commits.

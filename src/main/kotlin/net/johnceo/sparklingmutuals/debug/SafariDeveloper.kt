@@ -27,7 +27,8 @@ import java.time.Instant
 import java.util.UUID
 
 object SafariDeveloper {
-    val enabled by lazy {
+//? if extended {
+/*    val enabled by lazy {
         FabricLoader.getInstance().getModContainer("sparkling-mutuals").orElse(null)?.metadata
             ?.getCustomValue("sparkling-mutuals:developer")?.asString == "true"
     }
@@ -182,4 +183,10 @@ object SafariDeveloper {
         Files.writeString(file, GsonBuilder().serializeNulls().setPrettyPrinting().create().toJson(data))
         return file
     }
+*///? } else {
+    const val enabled = false
+
+    @Suppress("UNUSED_PARAMETER")
+    fun event(message: String, showOnHud: Boolean = true) = Unit
+//? }
 }

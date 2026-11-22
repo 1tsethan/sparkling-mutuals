@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.config.AppearanceConfig
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -44,3 +45,4 @@ class SafariShinyMixin {
         net.johnceo.sparklingmutuals.safari.esp.DuplicoGlow.submit(state,poses,collector)
     }
 }
+*///? }

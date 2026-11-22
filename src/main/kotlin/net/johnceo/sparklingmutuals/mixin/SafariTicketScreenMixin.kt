@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.automation.SafariTicketSelect
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -16,3 +17,4 @@ abstract class SafariTicketScreenMixin {
         if (SafariTicketSelect.hideScreen(this as Screen)) info.cancel()
     }
 }
+*///? }

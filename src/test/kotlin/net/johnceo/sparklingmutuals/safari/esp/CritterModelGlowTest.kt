@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.esp
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.esp
 
 import net.minecraft.client.renderer.entity.ArmorStandRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
@@ -31,3 +32,4 @@ class CritterModelGlowTest {
         })
     }
 }
+*///? }

@@ -13,7 +13,11 @@ class NativeSettingsTest {
         assertSame(settings.customization.huds.progress,settings.tracking.progressHud.appearance)
         assertSame(settings.customization.huds.objectives,settings.tracking.objectivesHud.appearance)
         assertSame(settings.customization.huds.doomThrow,settings.safari.capture.doomAppearance)
-        assertEquals(18,catalog.pages.size)
+//? if extended {
+/*        assertEquals(18,catalog.pages.size)
+*///? } else {
+        assertEquals(17,catalog.pages.size)
+//? }
         assertNotNull(catalog.pages.firstOrNull {it.name=="ESP General"})
         assertNotNull(catalog.pages.firstOrNull { it.name=="Mode-wide Critter Toggles" })
         assertNotNull(catalog.pages.firstOrNull { it.name=="Profitable Critter Toggles" })
@@ -46,9 +50,9 @@ class NativeSettingsTest {
         assertNull(SettingsColor.fromHex("red","0:255:1:2:3"))
     }
     @Test fun `public release versions compare numerically without treating failures as current`() {
-        assertTrue(ModUpdates.compareVersions("v3.10.0","3.9.9")!!>0)
-        assertEquals(0,ModUpdates.compareVersions("v3.6.3","3.6.3+mc26.1.2"))
-        assertNull(ModUpdates.compareVersions("unavailable","3.6.3"))
+        assertTrue(ReleaseVersion.compareVersions("v3.10.0","3.9.9")!!>0)
+        assertEquals(0,ReleaseVersion.compareVersions("v3.6.3","3.6.3+mc26.1.2"))
+        assertNull(ReleaseVersion.compareVersions("unavailable","3.6.3"))
     }
     @Test fun `release notes display headings bullets and command names without markdown syntax`() {
         val blocks=ReleaseNotes.parse("## Getting started\n- Use `/sm` and **settings**.\n\n\n[Releases](https://example.com)")

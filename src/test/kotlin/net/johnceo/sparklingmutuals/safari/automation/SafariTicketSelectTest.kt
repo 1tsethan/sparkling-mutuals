@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.johnceo.sparklingmutuals.safari.SafariTicketType
 import org.junit.jupiter.api.Assertions.*
@@ -93,3 +94,4 @@ class SafariTicketSelectTest {
         } finally { config.autoSelectSafariTicket=previous }
     }
 }
+*///? }

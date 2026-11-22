@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import java.util.UUID
 import net.minecraft.client.input.KeyEvent
@@ -93,3 +94,4 @@ class CjsGameplayHookTest {
         return loader.define().getDeclaredConstructor().newInstance()
     }
 }
+*///? }

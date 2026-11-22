@@ -1,4 +1,5 @@
-/*
+//? if extended {
+/*/*
  * Adapted from SkyHanni PhantomleafSolver.kt, commit b3543887dfb80d95ff9880b3f610167ac2c104f2.
  * Copyright SkyHanni contributors. Licensed under LGPL-2.1; see licenses/SkyHanni-LGPL-2.1.txt.
  * Changes: standalone state, Fabric lifecycle/sound hook, native settings and world rendering.
@@ -101,3 +102,4 @@ object PhantomleafSolver {
     }
     fun reset() { state.reset(); world = null; beamsBroken = false }
 }
+*///? }

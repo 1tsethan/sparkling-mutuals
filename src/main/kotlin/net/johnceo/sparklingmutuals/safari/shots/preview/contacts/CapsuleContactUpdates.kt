@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.shots.preview.contacts
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.shots.preview.contacts
 
 /** Collision cache updates only: no input interception, recording or exports. */
 object CapsuleContactUpdates {
@@ -18,3 +19,4 @@ object CapsuleContactUpdates {
         }
     }
 }
+*///? }

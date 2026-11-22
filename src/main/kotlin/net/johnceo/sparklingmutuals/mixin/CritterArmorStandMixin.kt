@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.esp.CritterGlowState
 import net.minecraft.client.renderer.entity.ArmorStandRenderer
@@ -19,3 +20,4 @@ class CritterArmorStandMixin {
         if ((state as CritterGlowState).`sm$isCritterGlow`()) ci.returnValue = null
     }
 }
+*///? }

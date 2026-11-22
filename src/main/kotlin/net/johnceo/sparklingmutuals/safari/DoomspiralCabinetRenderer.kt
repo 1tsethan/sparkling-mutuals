@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari
 
 import net.johnceo.sparklingmutuals.hud.HudFonts
 import net.johnceo.sparklingmutuals.safari.ui.CritterNames
@@ -209,3 +210,4 @@ internal object DoomspiralCabinetRenderer {
 
     private fun color(rgb: Int, alpha: Int = 255) = (alpha.coerceIn(0, 255) shl 24) or rgb
 }
+*///? }

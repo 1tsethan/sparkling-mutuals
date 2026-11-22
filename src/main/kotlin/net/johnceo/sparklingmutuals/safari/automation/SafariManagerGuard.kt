@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation
 
 import net.johnceo.sparklingmutuals.compat.*
 import net.johnceo.sparklingmutuals.LocalChat
@@ -20,18 +21,12 @@ import org.slf4j.LoggerFactory
 object SafariManagerGuard {
     private val logger = LoggerFactory.getLogger("sparkling-mutuals/entry-guard")
     private val presence = SafariEntryPresence()
-    private val runState = SafariEntryRunState()
     private val kick = EntryKickHold()
     private val managerTargets = EntryManagerTargets()
     private var requestedRosterAt = 0L
     private var messagedAt = 0L
     private var lastDecision = ""
     fun register() { SafariPartyInput.register(); SafariTicketSelect.register() }
-    fun activeRun(client: Minecraft): Boolean {
-        val player = client.player ?: return false
-        return runState.active(client.level, SafariIsland.onIsland, SafariAssist.location,
-            SafariAreaMap.areaAt(player.x, player.y, player.z))
-    }
     private fun stage() = when {
         SafariIsland.onIsland -> EntryStage.SAFARI
         SafariIsland.currentMode.equals("foraging_3", true) -> EntryStage.TORRHUS
@@ -61,7 +56,7 @@ object SafariManagerGuard {
         if (!ConfigManager.holdManagerOnKick || !inSafariInstance() || !chat.body.contains("kick", true)) return
         kick.report(client.level, receivedAt)
     }
-    fun reset() { messagedAt = 0; requestedRosterAt = 0; lastDecision = ""; presence.reset(); runState.reset(); kick.reset(); managerTargets.reset() }
+    fun reset() { messagedAt = 0; requestedRosterAt = 0; lastDecision = ""; presence.reset(); SafariEntryRunObservation.reset(); kick.reset(); managerTargets.reset() }
     fun entryItem(title: String, nameTag: Boolean, playerInventory: Boolean) =
         SafariRules.strip(title).trim().equals("Critter Safari Entry", true) && nameTag && !playerInventory
     private fun entrySlot(containerId: Int, slotId: Int): Slot? {
@@ -108,7 +103,7 @@ object SafariManagerGuard {
         if (shift) net.johnceo.sparklingmutuals.contest.ContestTracker.bypassPartyContest()
         val contestWaiting = if (stage() == EntryStage.TORRHUS)
             net.johnceo.sparklingmutuals.contest.ContestTracker.contestWaiting() else emptyList()
-        val active = activeRun(client)
+        val active = SafariEntryRunObservation.activeRun(client)
         val warpContestHold = stage() in setOf(EntryStage.TORRHUS,EntryStage.SAFARI) && !active &&
             net.johnceo.sparklingmutuals.alerts.SparkleWarping.contestPaused(client)
         val blocked = (warpContestHold || contestWaiting.isNotEmpty()) && !shift || (guard || ConfigManager.downtimeCommand) && EntryGuardDecision.block(stage(),
@@ -157,7 +152,7 @@ object SafariManagerGuard {
         onClientTick(client)
         val currentStage = stage()
         val guard = ConfigManager.holdManagerOnKick
-        val contestHold = currentStage in setOf(EntryStage.TORRHUS, EntryStage.SAFARI) && !activeRun(client) &&
+        val contestHold = currentStage in setOf(EntryStage.TORRHUS, EntryStage.SAFARI) && !SafariEntryRunObservation.activeRun(client) &&
             net.johnceo.sparklingmutuals.alerts.SparkleWarping.contestPaused(client)
         val ticketHold = currentStage == EntryStage.TORRHUS &&
             net.johnceo.sparklingmutuals.contest.ContestTracker.contestWaiting().isNotEmpty()
@@ -187,3 +182,4 @@ object SafariManagerGuard {
             named(entity), partyPlayer, labels)
     }
 }
+*///? }

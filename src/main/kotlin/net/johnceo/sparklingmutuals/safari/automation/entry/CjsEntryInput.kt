@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import java.util.UUID
 import net.johnceo.sparklingmutuals.compat.smScreen
@@ -116,3 +117,4 @@ internal class CjsEntryInput(private val approach: CjsApproachInput) {
         })
     }
 }
+*///? }

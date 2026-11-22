@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "package": "net.johnceo.sparklingmutuals.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [],
+  "client": [
+    "DisconnectedScreenAccessor",
+    "HypixelDisconnectMixin",
+    "CritterGlowStateMixin",
+    "CritterArmorStandMixin",
+    "DoomspiralLotteryHudMixin",
+    "SafariWaterFogMixin",
+    "SafariWaterSurfaceMixin",
+    "SafariWaterOverlayMixin",
+    "SafariSodiumWaterMixin",
+    "SafariPaintingMixin",
+    "SafariShinyMixin",
+    "SafariAttackKeyAccessor",
+    "SafariAutoClickerMixin",
+    "SafariCandleMixin",
+    "SafariManagerMixin",
+    "CjsEntryFocusMixin",
+    "CjsEntryKeyboardMixin",
+    "CjsEntryMouseMixin",
+    "SafariTicketScreenMixin",
+    "PhantomleafSoundMixin",
+    "CapsuleContactPacketMixin",
+    "CapsuleShaderRenderMixin",
+    "GemzieUseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

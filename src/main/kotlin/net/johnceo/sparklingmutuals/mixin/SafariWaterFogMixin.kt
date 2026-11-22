@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.ClearWater
 import net.minecraft.client.Camera
@@ -23,3 +24,4 @@ class SafariWaterFogMixin {
         fog.cloudEnd = far + 1024f
     }
 }
+*///? }

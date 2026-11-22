@@ -51,6 +51,14 @@ jobs:
       fail-fast: false
       matrix:
         minecraft: ['26.1.2', '26.2', '26.3']
+        edition: [standard, full, noauto]
+        include:
+          - edition: standard
+            suffix: ''
+          - edition: full
+            suffix: -full
+          - edition: noauto
+            suffix: -noauto
     steps:
       - uses: actions/checkout@v6
         with:
@@ -63,14 +71,29 @@ jobs:
           distribution: 'microsoft'
       - uses: gradle/actions/setup-gradle@v6
       - run: chmod +x gradlew
-      - run: ./gradlew validateReleaseTag :${{ matrix.minecraft }}:verifyTargetJar
+      - run: ./gradlew validateReleaseTag :${{ matrix.minecraft }}${{ matrix.suffix }}:verifyTargetJar
       - uses: actions/upload-artifact@v7
         with:
-          name: jar-mc${{ matrix.minecraft }}
-          path: versions/${{ matrix.minecraft }}/build/libs/sparkling-mutuals-*+mc${{ matrix.minecraft }}.jar
+          name: jar-mc${{ matrix.minecraft }}-${{ matrix.edition }}
+          path: versions/${{ matrix.minecraft }}${{ matrix.suffix }}/build/libs/sparkling-mutuals-*+mc${{ matrix.minecraft }}.jar
           if-no-files-found: error
+  windows-updater:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: .\gradlew.bat validateReleaseTag :26.1.2-full:test --tests '*UpdateInstallTest'
+        env:
+          JAVA_TOOL_OPTIONS: -Djunit.jupiter.tempdir.cleanup.mode.default=NEVER
   verify:
-    needs: [sync-backend, build-logic, target]
+    needs: [sync-backend, build-logic, target, windows-updater]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -88,11 +111,16 @@ jobs:
           path: incoming
           merge-multiple: true
       - run: chmod +x gradlew
-      - run: ./gradlew validateReleaseTag verifyDistributions -PdistributionDir=incoming
+      - id: distribution
+        run: |
+          ./gradlew validateReleaseTag collectReleaseDistribution -PdistributionDir=incoming
+          echo "directory=build/distributions/${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v7
         with:
           name: verified-release-jars
-          path: incoming/*.jar
+          path: |
+            ${{ steps.distribution.outputs.directory }}/*.jar
+            ${{ steps.distribution.outputs.directory }}/build-manifest.json
           if-no-files-found: error
   publish:
     needs: verify
@@ -118,3 +146,28 @@ jobs:
       - run: ./gradlew publishVerifiedRelease -PdistributionDir=incoming
         env:
           GITHUB_TOKEN: ${{ github.token }}
+  publish-standard:
+    needs: publish
+    if: github.repository == 'johnceoskyblock/sparkling-mutuals' && vars.MODRINTH_APPROVED == 'true'
+    runs-on: ubuntu-24.04
+    environment: modrinth
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - uses: gradle/actions/setup-gradle@v6
+      - uses: actions/download-artifact@v8
+        with:
+          name: verified-release-jars
+          path: incoming
+      - run: chmod +x gradlew
+      - run: ./gradlew validateReleaseTag verifyStandardForModrinth -PdistributionDir=incoming
+      - run: python3 scripts/publish_standard.py incoming
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

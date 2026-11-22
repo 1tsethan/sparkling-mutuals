@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.safari.shots.preview.CapsulePreviewRenderer
 import net.minecraft.client.renderer.LevelRenderer
@@ -15,3 +16,4 @@ abstract class CapsuleShaderRenderMixin {
     private fun capsuleAfterShaders(ci: CallbackInfo) { CapsulePreviewRenderer.afterShaders() }
     //? }
 }
+*///? }

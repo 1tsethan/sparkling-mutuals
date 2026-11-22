@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.config
+//? if updater {
+/*package net.johnceo.sparklingmutuals.config
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -67,4 +68,23 @@ class ReleaseUpdateCheckerTest {
         assertTrue(ReleaseUpdateChecker.compareVersions("v4.0.0","3.6.4")!! > 0)
         assertEquals(0,ReleaseUpdateChecker.compareVersions("v4.0.0","4.0.0+mc26.3"))
     }
+
+    @Test fun `only the exact unambiguous Full file and same release manifest can be downloaded`() {
+        val root = "https://github.com/johnceoskyblock/sparkling-mutuals/releases/download/v4.1.0/"
+        val full = "sparkling-mutuals-4.1.0+mc26.3.jar"
+        fun asset(name: String, url: String = root + name) = """{"name":"$name","browser_download_url":"$url"}"""
+        fun release(vararg assets: String) = """[{"tag_name":"v4.1.0","name":"Release","assets":[${assets.joinToString()}]}]"""
+        val candidate = ReleaseUpdateChecker.newest(release(
+            asset(full), asset("sparkling-mutuals-standard-4.1.0+mc26.3.jar"), asset("build-manifest.json")
+        ), "26.3")!!
+        assertEquals(root + full, candidate.asset.toString())
+        assertEquals(root + "build-manifest.json", candidate.manifest.toString())
+        assertNull(ReleaseUpdateChecker.newest(release(asset(full), asset(full)), "26.3"))
+        assertNull(ReleaseUpdateChecker.newest(release(asset(full.replace("+mc26.3", "+mc26.2"))), "26.3"))
+        assertNull(ReleaseUpdateChecker.newest(release(asset(full, "https://example.com/$full")), "26.3")!!.asset)
+        assertNull(ReleaseUpdateChecker.newest(
+            release(asset(full), asset("build-manifest.json"), asset("build-manifest.json")), "26.3"
+        )!!.manifest)
+    }
 }
+*///? }

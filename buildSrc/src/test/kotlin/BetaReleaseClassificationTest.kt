@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.net.http.HttpRequest
 import java.nio.ByteBuffer
-import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Flow
 import java.util.concurrent.TimeUnit
@@ -23,8 +22,6 @@ class BetaReleaseClassificationTest {
         })
         return JsonSlurper().parseText(complete.get(5, TimeUnit.SECONDS)) as Map<*, *>
     }
-    private fun files(version: String) = releaseFiles().map { it.copy(modVersion=version,
-        path=Path.of("sparkling-mutuals-$version+mc${it.minecraft}.jar")) }
     private fun existing(version: String, draft: Boolean, prerelease: Boolean?): ExistingRelease {
         val api = GitHubReleaseApi(sha, ReleaseTransport { method, url, _, _, _ ->
             require(method == "GET")
@@ -33,7 +30,7 @@ class BetaReleaseClassificationTest {
                     "tag_name" to "v$version", "draft" to draft, "body" to "Written notes").also {
                         if (prerelease != null) it["prerelease"] = prerelease
                     }
-                url.contains("/assets?") -> files(version).mapIndexed { i, f -> mapOf("id" to (i+1).toLong(),
+                url.contains("/assets?") -> (releaseFiles(version) + releaseManifest()).mapIndexed { i, f -> mapOf("id" to (i+1).toLong(),
                     "name" to f.path.fileName.toString(), "size" to f.size, "digest" to "sha256:${f.sha256}") }
                 else -> throw AssertionError("Unexpected request")
             }
@@ -65,10 +62,10 @@ class BetaReleaseClassificationTest {
     @Test fun classificationMismatchRejectsBothDraftsAndPublishedNoops() {
         for (draft in listOf(true, false)) {
             assertThrows(IllegalArgumentException::class.java) {
-                planRelease("v3.3.0", "3.3.0", files("3.3.0"), existing("3.3.0", draft, true))
+                planRelease("v3.3.0", "3.3.0", releaseFiles("3.3.0"), releaseManifest(), existing("3.3.0", draft, true))
             }
             assertThrows(IllegalArgumentException::class.java) {
-                planRelease("v3.3.0-beta.1", "3.3.0-beta.1", files("3.3.0-beta.1"), existing("3.3.0-beta.1", draft, false))
+                planRelease("v3.3.0-beta.1", "3.3.0-beta.1", releaseFiles("3.3.0-beta.1"), releaseManifest(), existing("3.3.0-beta.1", draft, false))
             }
         }
     }
@@ -77,7 +74,7 @@ class BetaReleaseClassificationTest {
     }
     @Test fun correctlyClassifiedBetaDraftAndPublishedNoopRemainEligible() {
         val version = "3.3.0-beta.1"
-        assertEquals(ReleaseDecision.UPDATE_DRAFT, planRelease("v$version", version, files(version), existing(version, true, true)).decision)
-        assertEquals(ReleaseDecision.PUBLISHED_NOOP, planRelease("v$version", version, files(version), existing(version, false, true)).decision)
+        assertEquals(ReleaseDecision.UPDATE_DRAFT, planRelease("v$version", version, releaseFiles(version), releaseManifest(), existing(version, true, true)).decision)
+        assertEquals(ReleaseDecision.PUBLISHED_NOOP, planRelease("v$version", version, releaseFiles(version), releaseManifest(), existing(version, false, true)).decision)
     }
 }

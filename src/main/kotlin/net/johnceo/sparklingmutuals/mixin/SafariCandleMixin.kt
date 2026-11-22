@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.mixin
+//? if extended {
+/*package net.johnceo.sparklingmutuals.mixin
 
 import net.johnceo.sparklingmutuals.compat.redCandle
 import net.johnceo.sparklingmutuals.config.ConfigManager
@@ -37,3 +38,4 @@ abstract class SafariCandleMixin {
             result.returnValue = Shapes.block()
     }
 }
+*///? }

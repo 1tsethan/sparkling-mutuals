@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.hideyho
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.hideyho
 
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.johnceo.sparklingmutuals.LocalChat
@@ -69,3 +70,4 @@ object HideyhoQuest {
     private fun sameContext(client: Minecraft) = client.connection === connection && client.level === level
     fun reset() { pending = null; dialogue.reset(); connection = null; level = null; offeredAt = 0 }
 }
+*///? }

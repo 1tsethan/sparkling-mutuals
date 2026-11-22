@@ -1,4 +1,5 @@
-package net.johnceo.sparklingmutuals.safari.automation.entry
+//? if extended {
+/*package net.johnceo.sparklingmutuals.safari.automation.entry
 
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.ToggleKeyMapping
@@ -29,3 +30,4 @@ class CjsWalkingKeysTest {
         keys.drive(false,false);assertFalse(forward.isDown);assertFalse(sneak.isDown)
     }
 }
+*///? }

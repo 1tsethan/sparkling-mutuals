@@ -12,11 +12,19 @@
 
 A Fabric client mod for Hypixel SkyBlock’s Critter Safari.
 
+| Edition | Features | Updates |
+| --- | --- | --- |
+| Standard | Safari modes, shared progress, HUDs and history, with markers and discovery alerts limited to current local sightings | Modrinth |
+| Full | Original features, including gameplay automation and extended markers | GitHub Releases, with optional download and restart installation in game |
+| Full No Auto Update | Full gameplay features | Manual downloads from GitHub Releases |
+
+Standard is the default build. The features table below describes Full. Standard uses `config/sparkling-mutuals-legit`; both Full editions use the original `config/sparkling-mutuals`. See the [edition and migration guide](docs/EDITIONS.md).
+
 ## Installation
 
 1. Set up **Minecraft 26.1.2, 26.2, or 26.3** with **Java 25** and [Fabric Loader](https://fabricmc.net/use/installer/) **0.19.5 or newer**.
 2. Put [Fabric API](https://modrinth.com/mod/fabric-api) for your Minecraft version and [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) in your `mods` folder.
-3. Download Sparkling Mutuals from [GitHub Releases](https://github.com/johnceoskyblock/sparkling-mutuals/releases/latest). Pick the JAR whose `+mc` suffix matches your Minecraft version, put it in `mods`, and remove any older Sparkling Mutuals JAR.
+3. Pick the edition and the JAR whose `+mc` suffix matches your Minecraft version. Install a single Sparkling Mutuals JAR in `mods`. Full editions are available from [GitHub Releases](https://github.com/johnceoskyblock/sparkling-mutuals/releases/latest). Standard is intended for Modrinth after project review.
 4. Launch the Fabric profile and use `/sm` to open settings.
 
 ## Features

@@ -39,10 +39,18 @@ object JoinWelcome {
         val hypixel = JoinWelcomeState.hypixel(client.currentServer?.ip) ||
             SkyblockSidebar.lines(client).any { it.equals("www.hypixel.net", true) || it.equals("alpha.hypixel.net", true) }
         val skyblock = hypixel && SkyblockSidebar.inSkyblock(client)
-        if (skyblock) ModUpdates.check()
+        //? if updater {
+        /*if (skyblock) ModUpdates.check()
+        *///? }
         if (!state.shouldShow(skyblock, ModUpdates.label != "Checking…", System.currentTimeMillis())) return
-        val update = ModUpdates.release?.tag?.takeIf { (ModUpdates.compareVersions(it, ModUpdates.installed) ?: 0) > 0 }
+        //? if updater {
+        /*val update = ModUpdates.release?.tag?.takeIf {
+            (net.johnceo.sparklingmutuals.config.ReleaseVersion.compareVersions(it, ModUpdates.installed) ?: 0) > 0
+        }
         player.sendSystemMessage(message(update))
+        *///? } else {
+        player.sendSystemMessage(message())
+        //? }
     }
     /** This introduction is one MOTD-style block; ordinary local feedback keeps its [SM] prefix. */
     fun message(updateTag: String? = null): Component {
