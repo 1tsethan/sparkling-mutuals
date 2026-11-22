@@ -2,117 +2,128 @@ package net.johnceo.sparklingmutuals.api
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import net.johnceo.sparklingmutuals.config.ConfigManager
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
+import net.johnceo.sparklingmutuals.config.ConfigManager
+import net.johnceo.sparklingmutuals.honeyhives.Hive
 
 object HypixelApi {
+    private val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
+    private val profileCache=TimedLookupCache<Pair<ApiProvider,String>,JsonObject>()
+    private val nameCache=TimedLookupCache<String,String>()
+    private val discoveryUpdates=ProfileDiscoveryOverlay<Pair<ApiProvider,String>>()
 
-    private val client = HttpClient.newHttpClient()
+    /** Lookups go through Shiny Hunter's shared API when no key of your own is set. */
+    val provider get() = ApiProvider.capture()
+    val usingCloud get() = provider.cloud
 
-    fun getCurrentProfileUuid(uuid: String): String? {
-        return try {
-            val data = get(
-                "https://api.hypixel.net/v2/skyblock/profiles?key=${ConfigManager.apiKey}&uuid=$uuid"
-            )
-
-            if (!data.get("success").asBoolean || !data.has("profiles") || data.get("profiles").isJsonNull) {
-                throw RuntimeException("No SkyBlock profiles found")
-            }
-
-            data.getAsJsonArray("profiles")
-                .firstOrNull { it.asJsonObject.get("selected")?.asBoolean == true }
-                ?.asJsonObject
-                ?.get("profile_id")
-                ?.asString
-                ?: throw RuntimeException("No selected SkyBlock profile found")
-        } catch (e: Exception) {
-            println("❌ Selected profile lookup failed for UUID $uuid: $e")
-            null
+    private fun profiles(uuid: String, fresh: Boolean = false): JsonObject {
+        val id=uuid.replace("-","").lowercase(java.util.Locale.ROOT)
+        val source=provider
+        val key=source to id
+        val read={
+            val body=if (source.cloud) CloudApi.profiles(id) else get("https://api.hypixel.net/v2/skyblock/profiles?uuid=$id")
+            val selected=CloudProfiles.selectedProfileId(body) ?: throw ApiFailure.dataUnavailable()
+            SafariProfile.discoveriesFrom(CloudProfiles.member(body,id,selected) ?: throw ApiFailure.dataUnavailable())
+            body
+        }
+        val body=if (fresh) read().also { profileCache.put(key,it) } else profileCache.load(key,read)
+        return discoveryUpdates.apply(key,id,body)
+    }
+    fun clearProfileCache() { profileCache.clear();discoveryUpdates.clear() }
+    fun recordSparkling(participants: Set<String>,species: String) {
+        val source=provider
+        participants.forEach { uuid ->
+            val id=uuid.replace("-","").lowercase(java.util.Locale.ROOT)
+            val key=source to id
+            val baseline=profileCache.peek(key)?.let { body ->
+                CloudProfiles.selectedProfileId(body)?.let { CloudProfiles.member(body,id,it) }
+            }?.get("safari")?.takeIf { it.isJsonObject }?.asJsonObject?.get("total_captured_sparkling_critters")?.takeIf {
+                it.isJsonPrimitive && it.asJsonPrimitive.isNumber
+            }?.asLong
+            discoveryUpdates.caught(key,species,baseline)
         }
     }
 
-    fun getSparklingCritters(playerUuid: String, profileUuid: String): Set<String>? {
-        return try {
-            val member = getMember(playerUuid, profileUuid)
-            val safari = member.getAsJsonObject("safari")
-                ?: throw RuntimeException("Safari data not found")
+    fun getCurrentProfileUuid(uuid: String, fresh: Boolean = false): String = data {
+        CloudProfiles.selectedProfileId(profiles(uuid,fresh)) ?: throw ApiFailure.dataUnavailable()
+    }
 
-            safari.getAsJsonArray("discovered_sparkling_critters")
-                .map { it.asString }
-                .toSet()
-        } catch (e: Exception) {
-            println("❌ Sparkling critter fetch failed for UUID $playerUuid: $e")
-            null
+    fun getSparklingCritters(playerUuid: String, profileUuid: String): Set<String> = data {
+        val source = provider
+        val observation = net.johnceo.sparklingmutuals.commands.SafariLookup.discoveryObservation(playerUuid, source)
+        SafariProfile.discoveriesFrom(getMember(playerUuid, profileUuid)).also {
+            if (source == provider && observation != null) net.johnceo.sparklingmutuals.commands.SafariLookup.observeDiscoveries(playerUuid, source, it, observation)
         }
     }
 
-    fun getPlayerUuid(username: String): String? {
-        return try {
-            val request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/$username"))
-                .GET()
-                .build()
+    fun getPlayerUuid(username: String): String = nameCache.load(username.lowercase(java.util.Locale.ROOT)) {
+        val response = send(HttpRequest.newBuilder()
+            .uri(URI.create("https://api.mojang.com/users/profiles/minecraft/$username")))
+        if (response.statusCode() == 204 || response.statusCode() == 404) {
+            throw ApiFailure(ApiFailureKind.PLAYER_NOT_FOUND, "Minecraft player not found: $username")
+        }
+        if (response.statusCode() == 429) throw ApiFailure(ApiFailureKind.RATE_LIMIT,
+            "Player lookup request limit reached. Try again shortly.")
+        if (response.statusCode() != 200) throw ApiFailure.unavailable()
+        try { JsonParser.parseString(response.body()).asJsonObject.get("id").asString }
+        catch (_: Exception) { throw ApiFailure.unavailable() }
+    }
 
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-            when (response.statusCode()) {
-                204, 404 -> throw RuntimeException("Minecraft player not found: $username")
-                200 -> JsonParser.parseString(response.body()).asJsonObject.get("id").asString
-                else -> throw RuntimeException("Mojang API error: HTTP ${response.statusCode()}")
-            }
-        } catch (e: Exception) {
-            println("❌ UUID lookup failed for $username: $e")
-            null
+    fun getSafariTickets(playerUuid: String, profileUuid: String): Map<String, Long> = data {
+        val tickets = getMember(playerUuid, profileUuid).getAsJsonObject("safari")
+            ?.getAsJsonObject("tickets") ?: throw ApiFailure.dataUnavailable()
+        listOf("basic", "economy", "premium", "first_class").associateWith { name ->
+            tickets.get(name)?.takeUnless { it.isJsonNull }?.asLong ?: 0L
         }
     }
 
-    fun getSafariTickets(playerUuid: String, profileUuid: String): Map<String, Long>? {
-        return try {
-            val tickets = getMember(playerUuid, profileUuid)
-                .getAsJsonObject("safari")
-                ?.getAsJsonObject("tickets")
-                ?: throw RuntimeException("Safari tickets data not found")
-
-            mapOf(
-                "basic" to tickets.get("basic").asLong,
-                "economy" to tickets.get("economy").asLong,
-                "premium" to tickets.get("premium").asLong,
-                "first_class" to tickets.get("first_class").asLong
-            )
-        } catch (e: Exception) {
-            println("❌ Safari ticket lookup failed for UUID $playerUuid: $e")
-            null
+    fun getSafariProfile(playerUuid: String, fresh: Boolean = false): SafariProfile = data {
+        val source = provider
+        val observation = net.johnceo.sparklingmutuals.commands.SafariLookup.discoveryObservation(playerUuid, source)
+        val body = profiles(playerUuid, fresh)
+        val profile = CloudProfiles.selectedProfileId(body) ?: throw ApiFailure.dataUnavailable()
+        SafariProfile.from(CloudProfiles.member(body, playerUuid, profile) ?: throw ApiFailure.dataUnavailable()).also {
+            if (source == provider && observation != null) net.johnceo.sparklingmutuals.commands.SafariLookup.observeDiscoveries(playerUuid, source, it.discoveries, observation)
         }
     }
 
-    private fun getMember(playerUuid: String, profileUuid: String): JsonObject {
-        val data = get(
-            "https://api.hypixel.net/v2/skyblock/profile?key=${ConfigManager.apiKey}&profile=$profileUuid"
-        )
-
-        val profile = data.getAsJsonObject("profile")
-        val members = profile.getAsJsonObject("members")
-        val memberUuid = playerUuid.replace("-", "")
-
-        return members.get(memberUuid)?.takeIf { !it.isJsonNull }?.asJsonObject
-            ?: throw RuntimeException("Member data not found for UUID $playerUuid")
+    /** Hive id -> when it refills, for hives looted in the last hour on any session. */
+    fun getHoneyRefills(playerUuid: String): HoneyRefills = data {
+        val body=profiles(playerUuid,fresh=true)
+        val profile=CloudProfiles.selectedProfileId(body) ?: throw ApiFailure.dataUnavailable()
+        HoneyRefills(profile,HoneyRefills.read(CloudProfiles.member(body,playerUuid,profile) ?: throw ApiFailure.dataUnavailable()))
     }
 
-    private fun get(url: String): JsonObject {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .GET()
-            .build()
+    private fun getMember(playerUuid: String, profileUuid: String): JsonObject = data {
+        CloudProfiles.member(profiles(playerUuid),playerUuid,profileUuid) ?: throw ApiFailure.dataUnavailable()
+    }
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    internal fun onlineStatus(uuid: String, key: String): Boolean? = data {
+        val id = uuid.replace("-", "").lowercase()
+        if (!id.matches(Regex("[0-9a-f]{32}"))) return@data null
+        get("https://api.hypixel.net/v2/status?uuid=$id", key).get("session")
+            ?.takeIf { it.isJsonObject }?.asJsonObject?.get("online")
+            ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isBoolean }?.asBoolean
+    }
 
-        if (response.statusCode() != 200) {
-            throw RuntimeException("Hypixel API error: HTTP ${response.statusCode()}")
-        }
-
+    private fun get(url: String, key: String = ConfigManager.apiKey.trim()): JsonObject {
+        if (key.isEmpty()) throw ApiFailure(ApiFailureKind.MISSING_KEY,
+            "No Hypixel API key. Use /apikey or settings.")
+        // Keep credentials out of URLs and diagnostic messages.
+        val response = send(HttpRequest.newBuilder().uri(URI.create(url)).header("API-Key", key))
+        ApiFailure.fromResponse(response.statusCode(), response.body())?.let { throw it }
         return JsonParser.parseString(response.body()).asJsonObject
     }
+
+    private fun send(builder: HttpRequest.Builder): HttpResponse<String> = try {
+        client.send(builder.timeout(Duration.ofSeconds(10)).GET().build(), HttpResponse.BodyHandlers.ofString())
+    } catch (_: Exception) { throw ApiFailure.unavailable() }
+
+    private fun <T> data(read: () -> T): T = try { read() }
+        catch (failure: ApiFailure) { throw failure }
+        catch (_: Exception) { throw ApiFailure.malformedData() }
 }

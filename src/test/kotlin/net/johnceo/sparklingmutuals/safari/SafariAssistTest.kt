@@ -1,0 +1,57 @@
+package net.johnceo.sparklingmutuals.safari
+
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+
+class SafariAssistTest {
+    @Test fun `plain and formatted scoreboard rows retain area priority and fallback`() {
+        assertEquals("Haunted Mansion", SafariRules.zone(listOf("§7⏣ Hub", " Area: Haunted Mansion ")))
+        assertEquals("Forest Biome", SafariRules.zone(listOf("§a⏣ Forest Biome", "⏣ Icy Biome")))
+        assertEquals(SafariLocation.OUTSIDE, SafariLocation.resolve(listOf("Area: Critter Safari"), null, false))
+        assertEquals(SafariLocation.INSIDE, SafariLocation.resolve(listOf("Area: Critter Safari"), null, true))
+        assertEquals(SafariLocation.INSIDE, SafariLocation.resolve(listOf(" §6Critter Safari\u200B "), null, false))
+        assertEquals(SafariLocation.ENTRANCE, SafariLocation.resolve(listOf("⏣ Safari Entry"), 0, true))
+        assertEquals("Crème", SafariRules.strip("\t§cCrème\uE000\u200B "))
+    }
+
+    @Test fun `scan uses an inclusive spherical 80 block radius`() {
+        assertTrue(SafariRules.withinRange(6400.0))
+        assertFalse(SafariRules.withinRange(6400.01))
+        assertFalse(SafariRules.withinRange(Double.NaN))
+    }
+
+    @Test fun `haunted helpers only run in Safari haunted areas`() {
+        assertTrue(SafariRules.isSafari(listOf("⏣ Critter Safari")))
+        assertTrue(SafariRules.isSafari(listOf("⏣ Critter Safari\u200B\uE000")))
+        assertTrue(SafariRules.isSafari(listOf("Area: Critter Safari\u200B")))
+        assertFalse(SafariRules.isSafari(listOf("Area: Hub", "Critter Safari")))
+        assertTrue(SafariRules.isHaunted(listOf("⏣ Haunted Mansion")))
+        assertFalse(SafariRules.isHaunted(listOf("⏣ Hub", "Objective: Visit Haunted Mansion")))
+        assertFalse(SafariRules.isSafari(listOf("⏣ Critter Safari Entrance")))
+    }
+
+    @Test fun `CritterMod 0_9 sparkling labels match exact species`() {
+        assertEquals("Rockmite", SafariRules.sparklingSpecies("§6SPARKLING Rockmite"))
+        assertEquals("Rockmite", SafariRules.sparklingSpecies("§6SPARKLING Rockmite\u200B"))
+        assertEquals("Mantis Shrimp", SafariRules.sparklingSpecies("Sparkling Mantis Shrimp"))
+        assertNull(SafariRules.sparklingSpecies("Rockmite"))
+        assertNull(SafariRules.sparklingSpecies("Sparkling Rockmite Shard"))
+        assertNull(SafariRules.sparklingSpecies("Capturing Sparkling Rockmite"))
+    }
+
+    @Test fun `sleeping Wumpa suffix identifies only a sparkling Wumpa nametag`() {
+        assertEquals("Wumpa", SafariRules.sparklingSpecies("§6SPARKLING §fWumpa §7zZz"))
+        assertEquals("Wumpa", SafariRules.sparklingSpecies("SPARKLING Wumpa zZz\u200B"))
+        assertEquals("Wumpa", SafariRules.sparklingSpecies("Sparkling Wumpa"))
+        assertNull(SafariRules.sparklingSpecies("Wumpa zZz"))
+        assertNull(SafariRules.sparklingSpecies("SPARKLING Macaw zZz"))
+        assertNull(SafariRules.sparklingSpecies("SPARKLING Wumpa zZz Shard"))
+        assertNull(SafariRules.sparklingSpecies("CAPTURING SPARKLING Wumpa zZz"))
+    }
+
+    @Test fun `only server Hideyho dialogue arms quest acceptance`() {
+        assertTrue(SafariRules.isHideyhoDialogue("[NPC] Hideyho: Want to play again?"))
+        assertFalse(SafariRules.isHideyhoDialogue("Party > Farmer: Hideyho: Want to play again?"))
+        assertFalse(SafariRules.isHideyhoDialogue("[SM] Click to accept Hideyho"))
+    }
+}

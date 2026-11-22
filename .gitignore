@@ -1,6 +1,7 @@
 # gradle
 
 .gradle/
+.kotlin/
 build/
 out/
 classes/
@@ -31,7 +32,7 @@ bin/
 # fabric
 
 run/
-config/
+/config/
 
 # java
 
@@ -39,3 +40,13 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# local runtime logs
+logs/
+
+# Stonecutter generated per-target sources and IDE runs
+versions/*/src/
+versions/*/run/
+
+# Python workflow sender tests
+__pycache__/

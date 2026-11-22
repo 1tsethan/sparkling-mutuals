@@ -1,0 +1,183 @@
+package net.johnceo.sparklingmutuals.safari.esp
+
+import java.util.UUID
+import net.johnceo.sparklingmutuals.config.BiomeObjectiveConfig
+import net.johnceo.sparklingmutuals.safari.PartySparklingState
+import net.johnceo.sparklingmutuals.safari.SafariBiome
+import net.johnceo.sparklingmutuals.safari.SafariMode
+import net.johnceo.sparklingmutuals.safari.SafariRoster
+import net.johnceo.sparklingmutuals.safari.SafariRules
+import net.johnceo.sparklingmutuals.safari.SafariRun
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+
+/** Identification, palette and quadrant limits adapted from Nebulune a573283 (BSD-3-Clause). */
+data class EspEntity(val type: String, val texture: String? = null, val shulker: String? = null,
+    val fish: String? = null, val variant: String? = null, val invisible: Boolean = false, val passengers: Boolean = false)
+data class EspMob(val name: String, val biome: SafariBiome, val color: Int, val identifiers: List<EspEntity>)
+data class EspDrop(val id: Int, val x: Int, val y: Int, val z: Int)
+data class EspCaptureCandidate(val id: Int, val species: String, val display: Boolean, val mound: Boolean,
+    val rangeSquared: Double, val aimSquared: Double)
+internal data class EspCapsuleTarget(val id: UUID, val species: String, val box: AABB, val display: Boolean)
+internal data class EspCapsuleEscape(val species: String, val brokeOut: Boolean)
+object SafariEspRules {
+    private val throwMessage = Regex("^You threw a (?:Masterful )?Critter Capsule at the (.+)!$")
+    private val escapeMessage = Regex("^The (.+?) (escaped your (?:Masterful )?Critter Capsule|dodged your critter capsule)\\b", RegexOption.IGNORE_CASE)
+    fun labelSpecies(raw: String) = SafariRules.strip(raw).let { SafariRules.sparklingSpecies(it) ?: SafariRoster.named(it)?.name }
+    internal fun isCapturingLabel(raw: String?) =
+        raw?.let(SafariRules::strip)?.trimStart()?.startsWith("CAPTURING", ignoreCase = true) == true
+
+    internal fun nearCaptureMarker(dx: Double, dy: Double, dz: Double) =
+        dx * dx + dz * dz <= .75 * .75 && kotlin.math.abs(dy) <= 2.5
+    fun thrownSpecies(text: String) = throwMessage.matchEntire(text)?.groupValues?.get(1)?.let(::labelSpecies)
+    internal fun capsuleEscape(text: String): EspCapsuleEscape? {
+        val match = escapeMessage.find(text) ?: return null
+        val species = labelSpecies(match.groupValues[1]) ?: return null
+        return EspCapsuleEscape(species, match.groupValues[2].startsWith("escaped", ignoreCase = true))
+    }
+    fun escapedSpecies(text: String) = capsuleEscape(text)?.species
+    internal fun hideonForm(species: String) = species == "Hideonfloor" || species == "Hideonwall"
+
+    /** Use exact hits first. A close display can represent a larger server hitbox than the visible model. */
+    internal fun capsuleAim(eye: Vec3, limit: Vec3, targets: List<EspCapsuleTarget>, confirmedSpecies: Boolean = false,
+        visible: (Vec3) -> Boolean): Map<String, UUID> {
+        fun hit(box: AABB) = if (box.contains(eye)) eye else box.clip(eye, limit).orElse(null)
+        val exact = targets.mapNotNull { target -> hit(target.box)?.let { target to eye.distanceToSqr(it) } }
+            .minByOrNull { it.second }?.first
+        if (exact != null) return mapOf(exact.species to exact.id)
+
+        // The server-confirmed species allows the wider capsule contact area on native bodies too.
+        // Leave two possible bodies of that species unresolved.
+        return targets.filter { target ->
+            (confirmedSpecies || target.display && eye.distanceToSqr(target.box.center) <= 64.0) &&
+                hit(target.box.inflate(if (confirmedSpecies) .6 else .45)) != null && visible(target.box.center)
+        }.groupBy { it.species }.mapNotNull { (species, options) ->
+            options.singleOrNull()?.let { species to it.id }
+        }.toMap()
+    }
+    fun profitableEsp(species: String, enabled: Boolean) = enabled &&
+        net.johnceo.sparklingmutuals.config.SafariEspConfig.profitableEnabled(species) &&
+        species in net.johnceo.sparklingmutuals.commands.ProfitableCritters.cachedSpecies()
+    fun neededForRun(species: String, mound: Boolean, run: SafariRun?, fullClear: Boolean, profitable: Boolean = true,
+        party: PartySparklingState? = null) =
+        if (fullClear) true
+        else if (!BiomeObjectiveConfig.allowsEsp(species, SafariMode.UNIQUE, run)) false
+        else if (profitableEsp(species, profitable)) true
+        else if (species == "Rockmite" && mound) (run?.captureProgress(species) ?: 0) == 0 || party?.let { BiomeObjectiveConfig.needs(species, it) } == true
+        else (run?.captureProgress(species) ?: 0) == 0 && run?.uniqueUnavailable(species) != true && run?.sharedCritterComplete(species, net.johnceo.sparklingmutuals.safari.SafariMode.UNIQUE) != true
+    @Suppress("UNUSED_PARAMETER")
+    fun neededForSparkling(species: String, mound: Boolean, party: PartySparklingState, profitable: Boolean,
+        run: SafariRun? = null, uuid: java.util.UUID? = null, now: Long = System.currentTimeMillis()): Boolean {
+        if (run?.sparklingChecks?.wumpaPrerequisite(species, party) == true && run.captureProgress("Wumpa") == 0 &&
+            run.captureProgress(species) == 0) return true
+        if (!BiomeObjectiveConfig.check(species)) return false
+        if (net.johnceo.sparklingmutuals.safari.completion.ScannableCritterChecks.pending(species,run,party)) return true
+        if (profitableEsp(species, profitable)) return true
+        if (species == "Honeybug" || species == "Rockmite" && !mound) return false
+        if (species == "Doomspiral" || species == "Wumpa") return party.needs(species) && (run?.captureProgress(species) ?: 0) == 0
+        if (!party.needs(species)) return false
+        if (mound && species == "Rockmite") return run?.sparklingComplete(species, party) != true
+        return false // Automatic checking needs no ordinary critter highlight or per-UUID linger.
+    }
+    fun captureModel(type: String) = type.endsWith("display") || type == "armor_stand"
+    /** Structures are sources, not uncaught critters. Every actual critter needs a live species label. */
+    fun requiresCaptureLabel(species: String, type: String) = !(species == "Rockmite" && type == "item_display")
+    fun requiresModelLabel(species: String, type: String) = captureModel(type) && !(species == "Rockmite" && type == "item_display")
+    fun modelVisible(x: Float, y: Float, z: Float) = x.isFinite() && y.isFinite() && z.isFinite() &&
+        maxOf(kotlin.math.abs(x), kotlin.math.abs(y), kotlin.math.abs(z)) > .001f
+    fun capturedDisplay(species: String, candidates: List<EspCaptureCandidate>) = candidates.filter {
+        it.species == species && it.display && !it.mound && it.rangeSquared <= 80.0 * 80
+    }.minByOrNull { it.aimSquared + it.rangeSquared * .001 }?.id
+    val mobs = listOf(
+        EspMob("Cavernfish", SafariBiome.CAVERN, 0xFFB4641E.toInt(), listOf(EspEntity("tropical_fish", fish = "CLAYFISH/GRAY/BROWN"))),
+        EspMob("Flitter", SafariBiome.CAVERN, 0xFF285A6E.toInt(), listOf(EspEntity("item_display", texture = "a89a76deedd42b410344100df2fa79b6eeac7e6f287745d656179368340ffade"))),
+        EspMob("Shyworm", SafariBiome.CAVERN, 0xFF50A032.toInt(), listOf(EspEntity("armor_stand", texture = "b4287b8a0a642dac535a6ee29459efd17d5cee1eb359e436bc8e7abba3da14b7"))),
+        EspMob("Driftling", SafariBiome.CAVERN, 0xFF966E3C.toInt(), listOf(EspEntity("armor_stand", texture = "f4c4f8e5fce1ec2d299cb8a395792ecddc497a1d8af86faaa5e20373016c7225"))),
+        EspMob("Chuckwalla", SafariBiome.CAVERN, 0xFF3C3228.toInt(), listOf(EspEntity("item_display", texture = "fc63cd0d480971a7beae5fd503e5d51658cd906330843cbad92018f5b98b4fe5"))),
+        EspMob("Rockmite", SafariBiome.CAVERN, 0xFFA0A0A0.toInt(), listOf(EspEntity("silverfish"), EspEntity("item_display", texture = "5dbaab74d1acd0abe9d04abe9928725de5d4495fcb63b647228caf6944c20800"))),
+        EspMob("Scrappy", SafariBiome.CAVERN, 0xFFBE7882.toInt(), listOf(EspEntity("armadillo"))),
+        EspMob("Snoozle", SafariBiome.CAVERN, 0xFFA02828.toInt(), listOf(EspEntity("sniffer"))),
+        EspMob("Gemzie", SafariBiome.CAVERN, 0xFF96B4F0.toInt(), listOf(EspEntity("vex"))),
+        EspMob("Foxtrot", SafariBiome.FOREST, 0xFFF06E14.toInt(), listOf(EspEntity("fox"))),
+        EspMob("Bluebird", SafariBiome.FOREST, 0xFF1432C8.toInt(), listOf(EspEntity("parrot", variant = "BLUE"))),
+        EspMob("Honeybug", SafariBiome.FOREST, 0xFFF0BE1E.toInt(), listOf(EspEntity("bee"))),
+        EspMob("Treefrog", SafariBiome.FOREST, 0xFF6E825A.toInt(), listOf(EspEntity("frog"))),
+        EspMob("Woodchucker", SafariBiome.FOREST, 0xFF504646.toInt(), listOf(EspEntity("creaking"))),
+        EspMob("Fluffling", SafariBiome.FOREST, 0xFFE6E6E6.toInt(), listOf(EspEntity("panda"))),
+        EspMob("Hideonfloor", SafariBiome.FOREST, 0xFF648228.toInt(), listOf(EspEntity("shulker", shulker = "GREEN"), EspEntity("block_display", shulker = "GREEN"), EspEntity("item_display", shulker = "GREEN"))),
+        EspMob("Parakeet", SafariBiome.FOREST, 0xFF5AC832.toInt(), listOf(EspEntity("parrot", variant = "GREEN"))),
+        EspMob("Macaw", SafariBiome.FOREST, 0xFFD21E1E.toInt(), listOf(EspEntity("parrot", variant = "RED_BLUE"))),
+        EspMob("Areita", SafariBiome.HAUNTED, 0xFF145A5A.toInt(), listOf(EspEntity("cave_spider"))),
+        EspMob("Bloodbat", SafariBiome.HAUNTED, 0xFF5A281E.toInt(), listOf(EspEntity("bat"))),
+        EspMob("Duplico", SafariBiome.HAUNTED, 0xFF787878.toInt(), listOf(EspEntity("interaction"))),
+        EspMob("Gazer", SafariBiome.HAUNTED, 0xFF1E3246.toInt(), listOf(EspEntity("armor_stand", texture = "407b3c3d2c3fe259d69207a14ca5cd99713c7096ba122bb40326f3489e5d0d6c"))),
+        EspMob("Litterbug", SafariBiome.HAUNTED, 0xFF8232AA.toInt(), listOf(EspEntity("endermite"))),
+        EspMob("Solsnatcher", SafariBiome.HAUNTED, 0xFF323C82.toInt(), listOf(EspEntity("phantom"))),
+        EspMob("Gimmiegold", SafariBiome.HAUNTED, 0xFFFFD200.toInt(), listOf(EspEntity("item_display", texture = "8b329e108ac28b0bec8d47b7cdce253df1db80b46052b5915d963e1bcbab0db4"))),
+        EspMob("Hideonwall", SafariBiome.HAUNTED, 0xFF8C468C.toInt(), listOf(EspEntity("shulker", shulker = "PURPLE"), EspEntity("block_display", shulker = "PURPLE"), EspEntity("item_display", shulker = "PURPLE"))),
+        EspMob("Hideyho", SafariBiome.HAUNTED, 0xFFBEBEBE.toInt(), listOf(EspEntity("player", texture = "3504f1f2327a5110e643bb8667082512815fa434a29ed37f4ca83bb16d2db533"))),
+        EspMob("Doomspiral", SafariBiome.HAUNTED, 0xFF148C96.toInt(), listOf(EspEntity("warden"))),
+        EspMob("Strongarm", SafariBiome.ICY, 0xFFDC7814.toInt(), listOf(EspEntity("snow_golem"))),
+        EspMob("Tepid", SafariBiome.ICY, 0xFFC8D2C8.toInt(), listOf(EspEntity("tropical_fish", fish = "SNOOPER/WHITE/WHITE"))),
+        EspMob("Polaris", SafariBiome.ICY, 0xFFFFFFFF.toInt(), listOf(EspEntity("polar_bear"))),
+        EspMob("Shuddersquid", SafariBiome.ICY, 0xFF32BEB4.toInt(), listOf(EspEntity("glow_squid"))),
+        EspMob("Billygoat", SafariBiome.ICY, 0xFFE6DCC8.toInt(), listOf(EspEntity("goat"))),
+        EspMob("Mantis Shrimp", SafariBiome.ICY, 0xFF285A64.toInt(), listOf(EspEntity("item_display", texture = "9924c105aa431dabd47952dc1dddd6f751f883423f4db1487d9bacc2cfe99c7a"))),
+        EspMob("Nozzlenose", SafariBiome.ICY, 0xFF8C96AA.toInt(), listOf(EspEntity("dolphin"))),
+        EspMob("Troodon", SafariBiome.ICY, 0xFF7850BE.toInt(), listOf(EspEntity("item_display", texture = "53de4135a3b19a2187029c86a0020e58c907c7bdd4e37b7643f120e16a0aa9ab"))),
+        EspMob("Wumpa", SafariBiome.ICY, 0xFF645A5A.toInt(), listOf(EspEntity("ravager")))
+    )
+    private val byType = mobs.flatMap { mob -> mob.identifiers.map { it.type to (mob to it) } }.groupBy({ it.first }, { it.second })
+    internal fun canIdentify(type: String) = type in byType
+    fun identify(entity: EspEntity): EspMob? {
+        if (entity.type.endsWith("display") && entity.invisible) return null
+        if (entity.type == "silverfish" && (entity.invisible || entity.passengers)) return null
+        return byType[entity.type]?.firstOrNull { (_, rule) ->
+            (rule.texture == null || rule.texture == entity.texture) && (rule.shulker == null || rule.shulker == entity.shulker) &&
+            (rule.fish == null || rule.fish == entity.fish) && (rule.variant == null || rule.variant == entity.variant)
+        }?.first
+    }
+    fun targetCurrent(species: String, descriptor: EspEntity, removed: Boolean, registered: Boolean, sameLevel: Boolean) =
+        !removed && registered && sameLevel && identify(descriptor)?.name == species
+    /** A late-loaded frozen head is not proof of a remaining Driftling. Never mint a catch here. */
+    fun driftlingCurrent(labelBound: Boolean, labelCurrent: Boolean, labelVisible: Boolean,
+        motionCurrent: Boolean, movementObserved: Boolean): Boolean =
+        (!labelBound || labelCurrent) && motionCurrent && movementObserved
+    /** Static late-loaded Flitter skins are leftovers unless a visible live tag confirms them. */
+    fun flitterCurrent(labelBound: Boolean, labelCurrent: Boolean, labelVisible: Boolean, moving: Boolean) =
+        labelBound && labelCurrent && labelVisible || moving
+    fun shywormCurrent(labelBound: Boolean, labelCurrent: Boolean, surfaceY: Double) =
+        surfaceY > 2 && labelBound && labelCurrent
+    /** Chuckwalla is stationary, so a texture/hidden custom name cannot establish that it remains uncaught. */
+    fun chuckwallaCurrent(labelBound: Boolean, labelCurrent: Boolean, labelVisible: Boolean) =
+        labelBound && labelCurrent && labelVisible
+    /** Name-tag distance and idle movement are not reliable reasons to hide legacy moving-critter ESP. */
+    fun renderCurrent(species: String, sparkling: Boolean, entityCurrent: Boolean, motionCurrent: Boolean, labelCurrent: Boolean, profitable: Boolean = false) =
+        entityCurrent && (profitableEsp(species, profitable) || species == "Shyworm" || !sparkling && species in EspMotion.movingSpecies || motionCurrent && labelCurrent)
+    private val textures = EspTextureCache()
+    fun textureHash(encoded: String?) = textures.hash(encoded)
+    fun biomeAt(x: Double, z: Double): SafariBiome? = when {
+        x !in -200.0..100.0 || z !in -150.0..150.0 -> null
+        x >= -50 && z >= 0 -> SafariBiome.FOREST
+        x >= -50 -> SafariBiome.HAUNTED
+        z >= 0 -> SafariBiome.CAVERN
+        else -> SafariBiome.ICY
+    }
+    fun visible(inSafari: Boolean, enabled: Boolean, onlyInBiome: Boolean, player: SafariBiome?, mob: SafariBiome?) =
+        inSafari && enabled && mob != null && (!onlyInBiome || player != null && player == mob)
+    private class DropGroup(var minimum: EspDrop, var count: Int = 1)
+    fun floorDrops(displays: List<EspDrop>): List<EspDrop> {
+        if (displays.size < 3) return emptyList()
+        val groups = LinkedHashMap<Triple<Int, Int, Int>, DropGroup>()
+        for (drop in displays) {
+            val key = Triple(drop.x, drop.y, drop.z)
+            val group = groups[key]
+            if (group == null) groups[key] = DropGroup(drop)
+            else {
+                group.count++
+                if (drop.id < group.minimum.id) group.minimum = drop
+            }
+        }
+        return groups.values.mapNotNull { if (it.count >= 3) it.minimum else null }
+    }
+}

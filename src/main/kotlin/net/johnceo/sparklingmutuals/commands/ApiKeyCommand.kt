@@ -3,8 +3,8 @@ package net.johnceo.sparklingmutuals.commands
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
+import net.johnceo.sparklingmutuals.LocalChat
 import net.johnceo.sparklingmutuals.config.ConfigManager
-import net.minecraft.network.chat.Component
 
 object ApiKeyCommand {
 
@@ -18,7 +18,7 @@ object ApiKeyCommand {
                                 .executes {
                                     ConfigManager.apiKey = StringArgumentType.getString(it, "key")
                                     ConfigManager.save()
-                                    it.source.sendFeedback(Component.literal("Hypixel API key updated."))
+                                    it.source.sendFeedback(LocalChat.component("[SM] API key updated."))
                                     1
                                 }
                         )

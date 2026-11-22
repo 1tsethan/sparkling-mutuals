@@ -2,14 +2,17 @@
 	"schemaVersion": 1,
 	"id": "sparkling-mutuals",
 	"version": "${version}",
+	"custom": { "sparkling-mutuals:developer": "${developer}" },
 	"name": "Sparkling Mutuals",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Hypixel SkyBlock Safari helpers with critter highlights, party sparkling lookups, run tracking, personal bests, history, achievements, profit estimates and Miria contest alerts.",
 	"authors": [
-		"Me!"
+		"JohnCEO",
+		"JohnKuudra"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "",
+		"sources": "https://github.com/1tsethan/sparkling-mutuals",
+		"issues": "https://github.com/1tsethan/sparkling-mutuals/issues"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/sparkling-mutuals/icon.png",
@@ -27,7 +30,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
-		"minecraft": "~26.1.2",
+		"minecraft": "${minecraft}",
 		"java": ">=25",
 		"fabric-api": "*",
 		"fabric-language-kotlin": "*"

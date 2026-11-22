@@ -1,0 +1,87 @@
+# Chuckwalla
+
+[Index](README.md) · [Terminology](../DOCUMENTATION_GUIDE.md) · [Shared evidence](TRACKING.md)
+
+## Overview
+
+| Property | Value | Status |
+| --- | --- | --- |
+| Biome | Cavern | Implemented roster |
+| Rarity | Rare | Supplied server notes; not live revalidated |
+| Spawn source | Ordinary biome population; no dedicated spawn-event gate | Implemented evidence path; mechanics unverified |
+| Population model | Implemented minimum; actual population can exceed it | Implemented rule, not server guarantee |
+| Full Clear minimum | 2 shared captures before species adjustments | Implemented fallback/minimum |
+| Local scan coverage | X/Z (-100, 45); Full Clear radius 40 blocks; Sparkling radius 60 blocks | Implemented coverage |
+
+## What makes this critter different
+
+- Profitable-shard ESP can keep ordinary models highlighted after ordinary mode requirements finish.
+
+## Spawn prerequisites
+
+None. No species-specific resource or structure gate is used.
+
+## Evidence
+
+| Evidence | What it establishes | What it does not establish |
+| --- | --- | --- |
+| Personal capture / party loot share ([exact messages](MESSAGES.md)) | Own capture adds personal + shared evidence; attributed loot share adds shared evidence | Local checks, source resolution or personal PB from another player's catch |
+| Live textured item display / qualified check | Current sighting; qualified evidence contributes under mode rule | Capture or absence inferred from missing outline |
+| Supplied capsule notes | Supplied notes say standard capsules can fail, replacement UUIDs may follow escape, and Masterful catches are guaranteed once hit. | Server mechanics revalidated by this source audit; see [D2](../IMPLEMENTATION_AUDIT.md#d2) |
+| Retained qualified UUID check ([rules](TRACKING.md)) | Distinct checks reconciled with earlier captures | Historical sighting and its later catch counted twice |
+
+## Completion by mode
+
+| Mode | Capture requirement | Checking or source requirement | Party-report effect |
+| --- | --- | --- | --- |
+| Sparkling | None for ordinary critters; a confirmed Sparkling capture also completes the check. | 2 reconciled checks from qualified UUID sightings/shared captures; retain checks for the run. | Party cd can supply inherited checking; local scans retire it. |
+| Unique | One shared capture, or the confirmed-Sparkling capture override. | None. | Does not supply a capture. |
+| Full Clear | At least 2 shared captures. Local proof and report-based progress have [separate raised-target scopes](TRACKING.md#full-clear-evidence-and-late-entry). | Qualified empty local scan for row removal/local progress. | Without local proof, report plus capture minimum can complete progress; row still needs local proof. |
+
+## Display and highlights
+
+| Outcome | Implemented behavior |
+| --- | --- |
+| Progress | Mode-specific predicate above; see [shared modes](../../SAFARI_LOGIC.md). |
+| Missing/unchecked row | Unique uses its capture/source predicate. Sparkling lists needed unresolved checks. Full Clear needs local capture/absence proof, separately from report-based progress. See [panel rules](../MISSING_PANEL.md). |
+| Counters | None in the species row; capture panel shows actual shared catches. |
+| Ordinary ESP | Unique: until first shared capture. Full Clear: eligible uncaught models. Sparkling: no ordinary model ESP solely for automatic checking. Settings and model validity still apply. Profitable-shard highlighting remains available when enabled. |
+| Source helpers | None. |
+| Automatic completion announcements | Shared local whole-biome/report-readiness gates in [mode rules](../../SAFARI_LOGIC.md). |
+| PB eligibility | Personal Unique: own catch of each spawned species; proven zero-spawn types exempt. Full Clear: personal captures/local proof. Party Unique: separate shared-capture/absence predicate; progress alone is insufficient. |
+
+## Party reports and late entry
+
+Captures received before visiting this biome remain in the run. Reports supply checking trust, never missing capture events. For late entry, use retained shared captures plus qualified local coverage; absence alone is insufficient. See [evidence/lifecycle](TRACKING.md).
+
+## Retention and reopening
+
+Captures and qualified UUID checks persist through unloading/travel. Retained local Full Clear row proof survives leaving its radius; positive remaining population revokes local proof. A new run resets evidence; the ended run can remain displayed. Pending detection identities add no separate completion gate; see [audit D1](../IMPLEMENTATION_AUDIT.md#d1).
+
+## Examples
+
+One party loot share completes Unique Chuckwalla. Full Clear still needs its implemented minimum and local empty coverage, or report-based progress under the shared rule.
+
+## Implementation and validation
+
+[Shared source/caller map](TRACKING.md#source-and-validation-references) covers capture/event registration, scanner, mode predicates, UI/report consumers, PBs and resets. Species entries: `Chuckwalla` in `SafariFullClear.minimum` and `SafariEspRules.mobs`; [CavernCompletionZones.zones](../../src/main/kotlin/net/johnceo/sparklingmutuals/safari/completion/CavernCompletionZones.kt).
+
+Existing coverage: [SafariFullClearProgressTest](../../src/test/kotlin/net/johnceo/sparklingmutuals/safari/completion/SafariFullClearProgressTest.kt). Source inspection only; no local runtime suite or live Minecraft validation was performed for this documentation audit. CI results are separate.
+
+## Open questions
+
+Population guarantees and capsule success/escape claims from supplied notes were not live revalidated; see [audit D2](../IMPLEMENTATION_AUDIT.md#d2).
+
+## Last updated
+
+2026-10-27 — Personal Unique PBs exempt positively proven zero-spawn types.
+
+2026-10-27 — Distant loaded Chuckwalla texture models can draw ordinary ESP beyond 32 blocks without a visible name tag. Nearby loss of a previously bound tag suppresses the leftover model even after moving away; the original tag can restore it. Capture retirement and strict completion/contact checks remain authoritative.
+
+2026-10-26 — Removed ordinary ESP added solely for automatic Sparkling checks and its per-UUID linger. Capture/source and profitable-highlight exceptions remain separate.
+
+2026-10-20 — After a shared Driftling/Chuckwalla catch, defer increases to inferred capture targets for 2.5 seconds so delayed old models are not added on top of that catch. Positive remaining evidence still blocks completion during this interval. Stable live evidence afterward can raise targets normally; catches are unchanged.
+
+2026-10-20 — Ordinary head-model ESP and remaining-population/completion now require a bound, current visible species label. Retained hidden names and orphan textures are not live-capture evidence. Distant texture-only models wait for label confirmation; Sparkling skin detection remains independent.
+
+2026-10-19 (America/New_York) — Uniform species reference; audited evidence, modes, display and lifecycle. Reviewed source: `93de7ff3b0de2ccdd4a42bf48bc19efda6e9caee`; no local runtime source changes reviewed. See [revision convention](../DOCUMENTATION_GUIDE.md).
