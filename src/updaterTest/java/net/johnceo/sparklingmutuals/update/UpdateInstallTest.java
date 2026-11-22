@@ -176,8 +176,10 @@ class UpdateInstallTest {
     }
 
     private Fixture fixture() throws Exception {
-        var mods = Files.createDirectory(instance.resolve("mods"));
-        var updates = Files.createDirectories(instance.resolve("config").resolve("updates"));
+        // The test runner may place its temporary directory behind an OS path alias.
+        var directory = instance.toRealPath();
+        var mods = Files.createDirectory(directory.resolve("mods"));
+        var updates = Files.createDirectories(directory.resolve("config").resolve("updates"));
         var old = jar("sparkling-mutuals", null, "1.0.0", "26.3");
         var installed = Files.write(mods.resolve("sparkling-mutuals-1.0.0+mc26.3.jar"), old);
         return new Fixture(new UpdateInstall(mods, updates, installed, "1.0.0", "26.3"), installed, updates, old);
