@@ -73,6 +73,7 @@ loom {
 tasks.test {
     useJUnitPlatform()
     failOnNoDiscoveredTests = true
+    testLogging { exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
 }
 
 // Local, test-classpath research only; does not publish data or change the target matrix.
